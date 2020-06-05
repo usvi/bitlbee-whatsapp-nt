@@ -30,3 +30,13 @@ https://github.com/tatsuhiro-t/wslay
 
 So maybe eventually libwebsockets7 (v. 1.7.1) as in Ubuntu?
 
+### QR-code library
+Need some kind of library for QR-code authorization, one
+that can output the authorization code to a .gif or .png
+for authroization.
+
+## Ideas
+Make first test client for authorizing clients. It will store
+encryption keys which can be transferred to the plugin resource directory.
+Or via irc AUTH?
+
