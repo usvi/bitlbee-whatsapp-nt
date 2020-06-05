@@ -18,4 +18,15 @@ https://github.com/sigalor/whatsapp-web-reveng
 ### Websocket library
 It seems we need Websockets library for C.
 
+Somebody has made a list:
+
+https://github.com/facundofarias/awesome-websockets#c
+
+This is available on both Debian 9 and 10 and Ubuntu 16.04 LTS:
+https://libwebsockets.org/
+
+This is available on Debian 10 only:
+https://github.com/tatsuhiro-t/wslay
+
+So maybe eventually libwebsockets7 (v. 1.7.1) as in Ubuntu?
 
