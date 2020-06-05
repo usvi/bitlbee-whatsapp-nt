@@ -35,8 +35,22 @@ Need some kind of library for QR-code authorization, one
 that can output the authorization code to a .gif or .png
 for authroization.
 
+So maybe minimum libqrencode3 as it is also with that old Ubuntu LTS?
+
+http://megaui.net/fukuchi/works/qrencode/index.en.html
+
+### PNG library
+
+The QR code needs to be actually outputted as a valid format.
+PNG is cool. So its something like libpng16. Exists also in that old
+LTS.
+
+http://libpng.org/pub/png/libpng.html
+
 ## Ideas
-Make first test client for authorizing clients. It will store
+Make test binary for writing big arbitrary QR code PNG files.
+
+Make test binary for authorizing clients. It will store
 encryption keys which can be transferred to the plugin resource directory.
-Or via irc AUTH?
+Or via irc AUTH? Need to think a bit.
 
