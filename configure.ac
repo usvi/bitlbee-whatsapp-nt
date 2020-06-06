@@ -79,9 +79,12 @@ AC_ARG_WITH(
 )
 
 PKG_CHECK_MODULES([BITLBEE], [bitlbee >= 3.4])
-PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.28.0 gio-2.0 gobject-2.0])
-PKG_CHECK_MODULES([JSON], [json-glib-1.0 >= 0.14.0])
+#PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.28.0 gio-2.0 gobject-2.0])
+#PKG_CHECK_MODULES([JSON], [json-glib-1.0 >= 0.14.0])
 PKG_CHECK_MODULES([PNG], [libpng >= 1.6.0])
+PKG_CHECK_MODULES([WEBSOCKETS], [libwebsockets >= 1.7.0])
+PKG_CHECK_MODULES([QRENCODE], [libqrencode >= 3.4.0])
+
 
 PKG_CHECK_VAR([GLIB_GENMARSHAL], [glib-2.0], [glib_genmarshal])
 AS_IF(
