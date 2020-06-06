@@ -99,6 +99,6 @@ AS_IF(
     )]
 )
 
-AC_CONFIG_FILES([Makefile whatsapp/Makefile])
+AC_CONFIG_FILES([Makefile whatsapp-nt/Makefile])
 AC_SUBST([plugindir])
 AC_OUTPUT
