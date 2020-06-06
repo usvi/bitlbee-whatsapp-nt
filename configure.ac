@@ -1,4 +1,5 @@
-# Copyright 2014-2016 James Geboski <jgeboski@gmail.com>
+# Original copyright 2014-2016 James Geboski <jgeboski@gmail.com>
+# Modifications for bitlbee-whatsapp-nt by Janne Palaijarvi <jpaalija at gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,12 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+
 AC_INIT(
-    [bitlbee-facebook],
-    [1.2.0],
-    [https://github.com/bitlbee/bitlbee-facebook/issues],
-    [bitlbee-facebook],
-    [https://github.com/bitlbee/bitlbee-facebook],
+    [bitlbee-whatsapp-nt],
+    [0.0.1],
+    [https://github.com/usvi/bitlbee-whatsapp-nt/issues],
+    [bitlbee-whatsapp-nt],
+    [https://github.com/usvi/bitlbee-whatsapp-nt],
     []
 )
 
@@ -96,6 +99,6 @@ AS_IF(
     )]
 )
 
-AC_CONFIG_FILES([Makefile facebook/Makefile])
+AC_CONFIG_FILES([Makefile whatsapp/Makefile])
 AC_SUBST([plugindir])
 AC_OUTPUT
