@@ -47,7 +47,7 @@ LTS.
 
 http://libpng.org/pub/png/libpng.html
 
-## Ideas
+## Ideas / random thoughts
 Make test binary for writing big arbitrary QR code PNG files.
 
 Make test binary for authorizing clients. It will store
@@ -56,3 +56,6 @@ Or via irc AUTH? Need to think a bit.
 
 Build system should be more or less the same as with bitlbee-facebook,
 right? I have never used anything like this before, only pure makefiles.
+
+Best to start on Ubuntu 16.04 LTS. Then learn autogen/autowhatever
+framework by copying and modifying files until shit compiles.
