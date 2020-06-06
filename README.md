@@ -54,3 +54,5 @@ Make test binary for authorizing clients. It will store
 encryption keys which can be transferred to the plugin resource directory.
 Or via irc AUTH? Need to think a bit.
 
+Build system should be more or less the same as with bitlbee-facebook,
+right? I have never used anything like this before, only pure makefiles.
