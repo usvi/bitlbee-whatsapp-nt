@@ -59,3 +59,6 @@ right? I have never used anything like this before, only pure makefiles.
 
 Best to start on Ubuntu 16.04 LTS. Then learn autogen/autowhatever
 framework by copying and modifying files until shit compiles.
+There were alternatives, but better not rock the boat with something
+different from for example bitlbee-facebook.
+
