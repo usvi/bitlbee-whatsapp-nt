@@ -51,8 +51,10 @@
 
 
 
-bin_PROGRAMS = bbwhatsapp-nt-client
+bin_PROGRAMS = bbwhatsappnt-client
 
-bbwhatsapp_nt_client_SOURCES = \
+bbwhatsappnt_client_SOURCES = \
 	bbwant-client.c \
-	bbwant-client.h
+	bbwant-client.h \
+	bbwant-client-qrencode.c \
+	bbwant-client-qrencode.h
