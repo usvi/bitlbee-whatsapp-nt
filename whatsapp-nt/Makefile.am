@@ -51,9 +51,14 @@
 
 
 
-bin_PROGRAMS = bbwhatsappnt-client
+bin_PROGRAMS = bbwhatsapp-nt-client
 
-bbwhatsappnt_client_SOURCES = \
+
+bbwhatsapp_nt_client_LDFLAGS = \
+	$(QRENCODE_LIBS) \
+	$(PNG_LIBS)
+
+bbwhatsapp_nt_client_SOURCES = \
 	bbwant-client.c \
 	bbwant-client.h \
 	bbwant-client-qrencode.c \

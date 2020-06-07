@@ -1,4 +1,5 @@
 #include "bbwant-client.h"
+#include "bbwant-client-qrencode.h"
 
 #include <stdio.h>
 
