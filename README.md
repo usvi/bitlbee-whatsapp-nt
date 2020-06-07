@@ -62,3 +62,6 @@ framework by copying and modifying files until shit compiles.
 There were alternatives, but better not rock the boat with something
 different from for example bitlbee-facebook.
 
+Confirming from Debian 10 that autogen.sh is successful. Going back
+to Ubuntu 16.04 to continue development though.
+
