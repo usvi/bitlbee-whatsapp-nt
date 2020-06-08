@@ -21,7 +21,7 @@ static void BBWANT_Client_PrintHelp(void)
 
 static uint8_t u8BBWANT_Client_GetArgs(int argc, char* argv[], tBBWANT_Client_Params* pxClientParams)
 {
-  memset(pxClientParams, 0, sizeof(*pxClientParams));
+  // Caller should clear memory, so no need here.
 
   return 0;
 }
@@ -30,6 +30,8 @@ static uint8_t u8BBWANT_Client_GetArgs(int argc, char* argv[], tBBWANT_Client_Pa
 int main(int argc, char* argv[])
 {
   tBBWANT_Client_Params xClientParams;
+
+  memset(&xClientParams, 0, sizeof(xClientParams));
   BBWANT_Client_PrintHelp();
   u8BBWANT_Client_GetArgs(argc, argv, &xClientParams);
   
