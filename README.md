@@ -65,3 +65,5 @@ different from for example bitlbee-facebook.
 Confirming from Debian 10 that autogen.sh is successful. Going back
 to Ubuntu 16.04 to continue development though.
 
+It seems Whatsapp Web version keeps changing, so keep it configurable
+easily.
