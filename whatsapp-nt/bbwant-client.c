@@ -8,9 +8,9 @@
 
 typedef struct
 {
-  uint8_t u8QrTestHello;
+  uint8_t u8ParamQrTestHello;
 
-} tBBWANT_Client_Params;
+} tBBWANT_Client_State;
 
 
 
@@ -19,7 +19,7 @@ static void BBWANT_Client_PrintHelp(void)
   printf("bitlbee-whatsapp-nt-client v. 0.0.1\n");
 }
 
-static uint8_t u8BBWANT_Client_GetArgs(int argc, char* argv[], tBBWANT_Client_Params* pxClientParams)
+static uint8_t u8BBWANT_Client_GetArgs(int argc, char* argv[], tBBWANT_Client_State* pxClientState)
 {
   // Caller should clear memory, so no need here.
 
@@ -29,12 +29,17 @@ static uint8_t u8BBWANT_Client_GetArgs(int argc, char* argv[], tBBWANT_Client_Pa
 
 int main(int argc, char* argv[])
 {
-  tBBWANT_Client_Params xClientParams;
+  tBBWANT_Client_State xClientState;
+  uint8_t u8Ret = 0;
 
-  memset(&xClientParams, 0, sizeof(xClientParams));
+  memset(&xClientState, 0, sizeof(xClientState));
   BBWANT_Client_PrintHelp();
-  u8BBWANT_Client_GetArgs(argc, argv, &xClientParams);
+  u8BBWANT_Client_GetArgs(argc, argv, &xClientState);
   
-
-  return 0;
+  if (xClientState.u8ParamQrTestHello)
+  {
+    //u8Ret = u8QrMakeHelloTest(&xClientState);
+  }
+  
+  return u8Ret;
 }
