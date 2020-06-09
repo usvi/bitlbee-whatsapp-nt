@@ -8,7 +8,7 @@
 
 typedef struct
 {
-  uint8_t u8ParamQrTestHello;
+  uint8_t u8ParamQrHelloTest;
 
 } tBBWANT_Client_State;
 
@@ -22,6 +22,23 @@ static void BBWANT_Client_PrintHelp(void)
 static uint8_t u8BBWANT_Client_GetArgs(int argc, char* argv[], tBBWANT_Client_State* pxClientState)
 {
   // Caller should clear memory, so no need here.
+  int i = 0;
+
+  for (i = 1; i < argc; i++)
+  {
+    if (strcmp(argv[i], "--qr-hello-test") == 0)
+    {
+      pxClientState->u8ParamQrHelloTest = 1;
+    }
+  }
+
+  return 0;
+}
+
+
+uint8_t u8MakeQrHelloTest(tBBWANT_Client_State* pxClientState)
+{
+  printf("QR Hello Test\n");
 
   return 0;
 }
@@ -36,9 +53,9 @@ int main(int argc, char* argv[])
   BBWANT_Client_PrintHelp();
   u8BBWANT_Client_GetArgs(argc, argv, &xClientState);
   
-  if (xClientState.u8ParamQrTestHello)
+  if (xClientState.u8ParamQrHelloTest)
   {
-    //u8Ret = u8QrMakeHelloTest(&xClientState);
+    u8Ret = u8MakeQrHelloTest(&xClientState);
   }
   
   return u8Ret;

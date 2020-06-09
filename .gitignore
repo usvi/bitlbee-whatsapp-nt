@@ -54,3 +54,5 @@ Makefile
 # Remnants
 /build-aux
 libtool
+bbwhatsapp-nt-client
+*.o
