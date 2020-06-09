@@ -31,8 +31,8 @@
 
 #define INCHES_PER_METER (100.0/2.54)
 
-static int margin = 4;
-static int size = 3;
+static int margin = 2;
+static int size = 10;
 static unsigned int fg_color[4] = {0, 0, 0, 255};
 static unsigned int bg_color[4] = {255, 255, 255, 255};
 static int dpi = 72;

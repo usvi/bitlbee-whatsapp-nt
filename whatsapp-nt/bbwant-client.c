@@ -6,6 +6,9 @@
 #include <string.h>
 
 
+#define BBWANT_QR_HELLO_TEST_URL "https://www.google.com/search?q=hello+world"
+
+
 typedef struct
 {
   uint8_t u8ParamQrHelloTest;
@@ -39,7 +42,11 @@ static uint8_t u8BBWANT_Client_GetArgs(int argc, char* argv[], tBBWANT_Client_St
 uint8_t u8MakeQrHelloTest(tBBWANT_Client_State* pxClientState)
 {
   printf("QR Hello Test\n");
-
+  QRcode* pxHelloQrCode = QRcode_encodeString8bit(BBWANT_QR_HELLO_TEST_URL, 0, QR_ECLEVEL_Q);
+  iBBWANT_Client_WriteQRAsPNG(pxHelloQrCode, "/tmp/foo.png");
+  
+  QRcode_free(pxHelloQrCode);
+  
   return 0;
 }
 
