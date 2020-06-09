@@ -22,6 +22,7 @@
  */
 
 #include "bbwant-client-qrencode.h"
+#include "bbwant.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -154,5 +155,5 @@ int iBBWANT_Client_WriteQRAsPNG(QRcode *qrcode, const char *outfile)
 	free(row);
 	free(palette);
 
-	return 0;
+	return BBWANT_OK;
 }

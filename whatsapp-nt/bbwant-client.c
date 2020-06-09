@@ -36,7 +36,7 @@ static uint8_t u8BBWANT_Client_GetArgs(int argc, char* argv[], tBBWANT_Client_St
     }
   }
 
-  return 0;
+  return BBWANT_OK;
 }
 
 
@@ -55,7 +55,7 @@ uint8_t u8MakeQrHelloTest(tBBWANT_Client_State* pxClientState)
   
   QRcode_free(pxHelloQrCode);
   
-  return 0;
+  return BBWANT_OK;
 }
 
 
