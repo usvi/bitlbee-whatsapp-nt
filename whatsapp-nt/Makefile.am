@@ -61,5 +61,6 @@ bbwhatsapp_nt_client_LDFLAGS = \
 bbwhatsapp_nt_client_SOURCES = \
 	bbwant-client.c \
 	bbwant-client.h \
+	bbwant.h \
 	bbwant-client-qrencode.c \
 	bbwant-client-qrencode.h

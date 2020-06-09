@@ -1,4 +1,5 @@
 #include "bbwant-client.h"
+#include "bbwant.h"
 #include "bbwant-client-qrencode.h"
 
 #include <stdio.h>
@@ -41,8 +42,15 @@ static uint8_t u8BBWANT_Client_GetArgs(int argc, char* argv[], tBBWANT_Client_St
 
 uint8_t u8MakeQrHelloTest(tBBWANT_Client_State* pxClientState)
 {
+  QRcode* pxHelloQrCode = NULL;
+
   printf("QR Hello Test\n");
-  QRcode* pxHelloQrCode = QRcode_encodeString8bit(BBWANT_QR_HELLO_TEST_URL, 0, QR_ECLEVEL_Q);
+  pxHelloQrCode = QRcode_encodeString8bit(BBWANT_QR_HELLO_TEST_URL, 0, QR_ECLEVEL_Q);
+
+  if (pxHelloQrCode == NULL)
+  {
+
+  }
   iBBWANT_Client_WriteQRAsPNG(pxHelloQrCode, "/tmp/foo.png");
   
   QRcode_free(pxHelloQrCode);
