@@ -31,8 +31,6 @@
 
 #define INCHES_PER_METER (100.0/2.54)
 
-static int margin = 2;
-static int size = 10;
 static unsigned int fg_color[4] = {0, 0, 0, 255};
 static unsigned int bg_color[4] = {255, 255, 255, 255};
 static int dpi = 72;
@@ -48,7 +46,7 @@ int iBBWANT_Client_WriteQRAsPNG(QRcode *qrcode, const char *outfile)
 	int x, y, xx, yy, bit;
 	int realwidth;
 
-	realwidth = (qrcode->width + margin * 2) * size;
+	realwidth = (qrcode->width + BBWANT_CLIENT_QR_MARGIN * 2) * BBWANT_CLIENT_QR_ELEMENT_SIZE;
 	row = (unsigned char *)malloc((realwidth + 7) / 8);
 	if(row == NULL) {
 		fprintf(stderr, "Failed to allocate memory.\n");
@@ -116,7 +114,7 @@ int iBBWANT_Client_WriteQRAsPNG(QRcode *qrcode, const char *outfile)
 
 	/* top margin */
 	memset(row, 0xff, (realwidth + 7) / 8);
-	for(y=0; y<margin * size; y++) {
+	for(y=0; y<BBWANT_CLIENT_QR_MARGIN * BBWANT_CLIENT_QR_ELEMENT_SIZE; y++) {
 		png_write_row(png_ptr, row);
 	}
 
@@ -126,10 +124,10 @@ int iBBWANT_Client_WriteQRAsPNG(QRcode *qrcode, const char *outfile)
 		bit = 7;
 		memset(row, 0xff, (realwidth + 7) / 8);
 		q = row;
-		q += margin * size / 8;
-		bit = 7 - (margin * size % 8);
+		q += BBWANT_CLIENT_QR_MARGIN * BBWANT_CLIENT_QR_ELEMENT_SIZE / 8;
+		bit = 7 - (BBWANT_CLIENT_QR_MARGIN * BBWANT_CLIENT_QR_ELEMENT_SIZE % 8);
 		for(x=0; x<qrcode->width; x++) {
-			for(xx=0; xx<size; xx++) {
+			for(xx=0; xx<BBWANT_CLIENT_QR_ELEMENT_SIZE; xx++) {
 				*q ^= (*p & 1) << bit;
 				bit--;
 				if(bit < 0) {
@@ -139,13 +137,13 @@ int iBBWANT_Client_WriteQRAsPNG(QRcode *qrcode, const char *outfile)
 			}
 			p++;
 		}
-		for(yy=0; yy<size; yy++) {
+		for(yy=0; yy<BBWANT_CLIENT_QR_ELEMENT_SIZE; yy++) {
 			png_write_row(png_ptr, row);
 		}
 	}
 	/* bottom margin */
 	memset(row, 0xff, (realwidth + 7) / 8);
-	for(y=0; y<margin * size; y++) {
+	for(y=0; y<BBWANT_CLIENT_QR_MARGIN * BBWANT_CLIENT_QR_ELEMENT_SIZE; y++) {
 		png_write_row(png_ptr, row);
 	}
 
