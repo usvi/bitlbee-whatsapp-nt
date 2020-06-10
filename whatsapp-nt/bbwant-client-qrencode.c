@@ -36,7 +36,8 @@ static unsigned int fg_color[4] = {0, 0, 0, 255};
 static unsigned int bg_color[4] = {255, 255, 255, 255};
 static int dpi = 72;
 
-int iBBWANT_Client_WriteQRAsPNG(QRcode *qrcode, const char *outfile)
+//FIXME: Whole function needs much better error handling.
+uint8_t u8BBWANT_Client_WriteQRAsPNG(QRcode *qrcode, const char *outfile)
 {
 	static FILE *fp; // avoid clobbering by setjmp.
 	png_structp png_ptr;

@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
 
 
 #define BBWANT_QR_HELLO_TEST_URL "https://www.google.com/search?q=hello+world"
@@ -40,22 +43,63 @@ static uint8_t u8BBWANT_Client_GetArgs(int argc, char* argv[], tBBWANT_Client_St
 }
 
 
-uint8_t u8MakeQrHelloTest(tBBWANT_Client_State* pxClientState)
+static uint8_t u8BBWANT_Client_MakeQrFileStringForUser(const char* sFormat, char* sFileString)
 {
-  QRcode* pxHelloQrCode = NULL;
+  uint8_t u8RetVal = BBWANT_OK;
+  uid_t xUid;
+  struct passwd* pxPasswd = NULL;
 
+  memset(&xUid, 0, sizeof(xUid));
+
+  xUid = geteuid(); // Always successful
+  pxPasswd = getpwuid(xUid);
+
+  if (!pxPasswd)
+  {
+    u8RetVal = BBWANT_ERROR;
+  }
+  else
+  {
+    snprintf(sFileString, BBWANT_FILE_PATH_SIZE, sFormat, pxPasswd->pw_name);
+    u8RetVal = BBWANT_OK;
+  }
+
+  return u8RetVal;
+}
+
+
+static uint8_t u8BBWANT_Client_MakeQrHelloTest(tBBWANT_Client_State* pxClientState)
+{
+  uint8_t u8RetVal = BBWANT_OK;
+  QRcode* pxHelloQrCode = NULL;
+  char sQrPngFilePath[BBWANT_FILE_PATH_SIZE] = { 0 };
+  
+  
   printf("QR Hello Test\n");
   pxHelloQrCode = QRcode_encodeString8bit(BBWANT_QR_HELLO_TEST_URL, 0, QR_ECLEVEL_Q);
 
   if (pxHelloQrCode == NULL)
   {
-
+    u8RetVal = BBWANT_ERROR;
   }
-  iBBWANT_Client_WriteQRAsPNG(pxHelloQrCode, "/tmp/foo.png");
+  else
+  {
+    u8RetVal = u8BBWANT_Client_MakeQrFileStringForUser(BBWANT_CLIENT_HELLO_TEST_QR_PATH_FORMAT,
+						       sQrPngFilePath);
+
+    if (u8RetVal == BBWANT_OK)
+    {
+      u8RetVal = u8BBWANT_Client_WriteQRAsPNG(pxHelloQrCode, sQrPngFilePath);
+
+      if (u8RetVal == BBWANT_OK)
+      {
+	printf("Successfully wrote test QR image to %s\n", sQrPngFilePath);
+      }
+    }
+    QRcode_free(pxHelloQrCode);
+  }
   
-  QRcode_free(pxHelloQrCode);
-  
-  return BBWANT_OK;
+  return u8RetVal;
 }
 
 
@@ -70,7 +114,7 @@ int main(int argc, char* argv[])
   
   if (xClientState.u8ParamQrHelloTest)
   {
-    u8Ret = u8MakeQrHelloTest(&xClientState);
+    u8Ret = u8BBWANT_Client_MakeQrHelloTest(&xClientState);
   }
   
   return u8Ret;
