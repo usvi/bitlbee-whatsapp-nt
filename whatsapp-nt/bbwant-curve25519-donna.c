@@ -45,6 +45,9 @@
  * uses many of the tricks described therein. Only the crecip function is taken
  * from the sample implementation. */
 
+/* Modifiedn for bitlbee-whatsapp-nt by Janne Paalijarvi <jpaalija gmail.com>
+   on year 2020. */
+
 #include <string.h>
 #include <stdint.h>
 
@@ -840,8 +843,9 @@ crecip(limb *out, const limb *z) {
   /* 2^255 - 21 */ fmul(out,t1,z11);
 }
 
-int
-curve25519_donna(u8 *mypublic, const u8 *secret, const u8 *basepoint) {
+
+uint8_t u8BBWANT_Curve25519Donna(u8 *mypublic, const u8 *secret, const u8 *basepoint)
+{
   limb bp[10], x[10], z[11], zmone[10];
   uint8_t e[32];
   int i;
@@ -856,5 +860,6 @@ curve25519_donna(u8 *mypublic, const u8 *secret, const u8 *basepoint) {
   crecip(zmone, z);
   fmul(z, x, zmone);
   fcontract(mypublic, z);
+
   return 0;
 }

@@ -62,5 +62,7 @@ bbwhatsapp_nt_client_SOURCES = \
 	bbwant-client.c \
 	bbwant-client.h \
 	bbwant.h \
+	bbwant-curve25519-donna.c \
+	bbwant-curve25519-donna.h \
 	bbwant-client-qrencode.c \
 	bbwant-client-qrencode.h
