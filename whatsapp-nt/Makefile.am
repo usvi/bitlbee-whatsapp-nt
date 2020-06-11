@@ -59,10 +59,12 @@ bbwhatsapp_nt_client_LDFLAGS = \
 	$(PNG_LIBS)
 
 bbwhatsapp_nt_client_SOURCES = \
-	bbwant-client.c \
-	bbwant-client.h \
 	bbwant.h \
 	bbwant-curve25519-donna.c \
 	bbwant-curve25519-donna.h \
+	bbwant-base64.c \
+	bbwant-base64.h \
+	bbwant-client.c \
+	bbwant-client.h \
 	bbwant-client-qrencode.c \
 	bbwant-client-qrencode.h
