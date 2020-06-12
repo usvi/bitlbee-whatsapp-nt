@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 
-
+/*
 static tBBWANT_ConnState* pxBBWANT_GetSetWebsockContext(tBBWANT_ConnState* pxConnState)
 {
   static tBBWANT_ConnState* pxStoredConnState = NULL;
@@ -19,6 +19,7 @@ static tBBWANT_ConnState* pxBBWANT_GetSetWebsockContext(tBBWANT_ConnState* pxCon
 
   return pxStoredConnState;
 }
+*/
 
 static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons reason,
 				   void *user, void *in, size_t len)
@@ -50,7 +51,21 @@ static struct lws_protocols axBBWANT_WebsockProtocols[] =
   { NULL, NULL, 0, 0 }
 };
 
-
+static const struct lws_extension axBBWANT_WebsockExts[] =
+{
+  {
+    "permessage-deflate",
+    lws_extension_callback_pm_deflate,
+    "permessage-deflate; client_max_window_bits"
+  },
+  {
+    "deflate-frame",
+    lws_extension_callback_pm_deflate,
+    "deflate_frame"
+  },
+  { NULL, NULL, NULL /* terminator */ }
+};
+    
 static uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
 					   tBBWANT_ConnState* pxConnState)
 {
@@ -187,6 +202,11 @@ static uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOrig
     else
     {
       pxConnState->pxWsClientConnectInfo->context = pxConnState->pxWsContext;
+      pxConnState->pxWsClientConnectInfo->ssl_connection = 1; // FIXME: Use dynamic
+      pxConnState->pxWsClientConnectInfo->host = pxConnState->pxWsClientConnectInfo->address;
+      pxConnState->pxWsClientConnectInfo->origin = pxConnState->sWebsockOriginUrlStore;
+      pxConnState->pxWsClientConnectInfo->ietf_version_or_minus_one = -1;
+      pxConnState->pxWsClientConnectInfo->client_exts = axBBWANT_WebsockExts;
     }
   }
   
@@ -195,9 +215,10 @@ static uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOrig
 
 static uint8_t u8BBWANT_FreeConnection(tBBWANT_ConnState* pxConnState)
 {
-  free(pxConnState->sWebsockUrlPartStore);
   free(pxConnState->pxWsClientConnectInfo);
-  free(pxConnState->pxWsContextCreationInfo);
+  free(pxConnState->sWebsockRealPathStore);
+  free(pxConnState->sWebsockOriginUrlStore);
+  free(pxConnState->sWebsockUrlPartStore);
   lws_context_destroy(pxConnState->pxWsContext);
   free(pxConnState);
   
