@@ -39,7 +39,8 @@ static tBBWANT_ConnState* pxBBWANT_GetSetWebsockContext(tBBWANT_ConnState* pxCon
   return pxStoredConnState;
 }
 
-static uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, tBBWANT_ConnState* pxConnState)
+static uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
+					   tBBWANT_ConnState* pxConnState)
 {
   // Everything needs to be malloced and zeroed.
   uint8_t u8RetVal = BBWANT_OK;
@@ -63,10 +64,10 @@ static uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, tBBWANT_ConnState
     }
     else
     {
-      pxConnState->pxWsClientConnectInfo = NULL;
-      pxConnState->pxWsClientConnectInfo = malloc(sizeof(struct lws_client_connect_info));
+      pxConnState->sWebsockOriginUrlStore = NULL;
+      pxConnState->sWebsockOriginUrlStore = malloc(BBWANT_URL_PATH_SIZE);
 
-      if (pxConnState->pxWsClientConnectInfo == NULL)
+      if (pxConnState->sWebsockOriginUrlStore == NULL)
       {
 	free(pxConnState->sWebsockUrlPartStore);
 	free(pxConnState);
@@ -74,21 +75,36 @@ static uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, tBBWANT_ConnState
       }
       else
       {
-	pxConnState->pxWsContextCreationInfo = NULL;
-	pxConnState->pxWsContextCreationInfo = malloc(sizeof(struct lws_context_creation_info));
-
-	if (pxConnState->pxWsContextCreationInfo == NULL)
+	pxConnState->pxWsClientConnectInfo = NULL;
+	pxConnState->pxWsClientConnectInfo = malloc(sizeof(struct lws_client_connect_info));
+	
+	if (pxConnState->pxWsClientConnectInfo == NULL)
 	{
-	  free(pxConnState->pxWsClientConnectInfo);
+	  free(pxConnState->sWebsockOriginUrlStore);
 	  free(pxConnState->sWebsockUrlPartStore);
 	  free(pxConnState);
 	  u8RetVal = BBWANT_ERROR;
+	}
+	else
+	{
+	  pxConnState->pxWsContextCreationInfo = NULL;
+	  pxConnState->pxWsContextCreationInfo = malloc(sizeof(struct lws_context_creation_info));
+	  
+	  if (pxConnState->pxWsContextCreationInfo == NULL)
+	  {
+	    free(pxConnState->pxWsClientConnectInfo);
+	    free(pxConnState->sWebsockOriginUrlStore);
+	    free(pxConnState->sWebsockUrlPartStore);
+	    free(pxConnState);
+	    u8RetVal = BBWANT_ERROR;
+	  }
 	}
       }
     }
   }
   // All malloc'd, good. Zero everything in one go.
   memset(pxConnState->sWebsockUrlPartStore, 0, BBWANT_URL_PATH_SIZE);
+  memset(pxConnState->sWebsockOriginUrlStore, 0, BBWANT_URL_PATH_SIZE);
   memset(pxConnState->pxWsClientConnectInfo, 0, sizeof(*(pxConnState->pxWsClientConnectInfo)));
   memset(pxConnState->pxWsContextCreationInfo, 0, sizeof(*(pxConnState->pxWsContextCreationInfo)));
   pxConnState->pxWsContext = NULL;
