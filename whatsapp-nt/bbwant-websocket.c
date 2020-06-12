@@ -42,18 +42,58 @@ static tBBWANT_ConnState* pxBBWANT_GetSetWebsockContext(tBBWANT_ConnState* pxCon
 static uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, tBBWANT_ConnState* pxConnState)
 {
   // Everything needs to be malloced and zeroed.
+  uint8_t u8RetVal = BBWANT_OK;
+    
+  pxConnState = NULL;
   pxConnState = malloc(sizeof(tBBWANT_ConnState));
-  // We need to malloc all of these eventually
-  /*
-  memset(&gxBBWANT_ClientConnectInfo, 0, sizeof(gxBBWANT_ClientConnectInfo));
-  memset(&gxBBWANT_ContextCreationInfo, 0, sizeof(gxBBWANT_ContextCreationInfo));
 
-  gxBBWANT_ClientConnectInfo.port = BBWANT_DEFAULT_WS_PORT;
+  if (pxConnState == NULL)
+  {
+    u8RetVal = BBWANT_ERROR;
+  }
+  else
+  {
+    pxConnState->sWebsockUrlPartStore = NULL;
+    pxConnState->sWebsockUrlPartStore = malloc(BBWANT_URL_PATH_SIZE);
+
+    if (pxConnState->sWebsockUrlPartStore == NULL)
+    {
+      free(pxConnState);
+      u8RetVal = BBWANT_ERROR;
+    }
+    else
+    {
+      pxConnState->pxWsClientConnectInfo = NULL;
+      pxConnState->pxWsClientConnectInfo = malloc(sizeof(struct lws_client_connect_info));
+
+      if (pxConnState->pxWsClientConnectInfo == NULL)
+      {
+	free(pxConnState->sWebsockUrlPartStore);
+	free(pxConnState);
+	u8RetVal = BBWANT_ERROR;
+      }
+      else
+      {
+	pxConnState->pxWsContextCreationInfo = NULL;
+	pxConnState->pxWsContextCreationInfo = malloc(sizeof(struct lws_context_creation_info));
+
+	if (pxConnState->pxWsContextCreationInfo == NULL)
+	{
+	  free(pxConnState->pxWsClientConnectInfo);
+	  free(pxConnState->sWebsockUrlPartStore);
+	  free(pxConnState);
+	  u8RetVal = BBWANT_ERROR;
+	}
+      }
+    }
+  }
+  // All malloc'd, good. Zero everything in one go.
+  memset(pxConnState->sWebsockUrlPartStore, 0, BBWANT_URL_PATH_SIZE);
+  memset(pxConnState->pxWsClientConnectInfo, 0, sizeof(*(pxConnState->pxWsClientConnectInfo)));
+  memset(pxConnState->pxWsContextCreationInfo, 0, sizeof(*(pxConnState->pxWsContextCreationInfo)));
+  pxConnState->pxWsContext = NULL;
   
-  //lws_parse_uri(sWsUrl, &(
-  */
-  
-  return 0;
+  return u8RetVal;
 }
 
 static uint8_t u8BBWANT_FreeConnection(tBBWANT_ConnState* pxConnState)
@@ -61,7 +101,7 @@ static uint8_t u8BBWANT_FreeConnection(tBBWANT_ConnState* pxConnState)
   free(pxConnState->sWebsockUrlPartStore);
   free(pxConnState->pxWsClientConnectInfo);
   free(pxConnState->pxWsContextCreationInfo);
-  free(pxConnState->pxWsContext);
+  lws_context_destroy(pxConnState->pxWsContext);
   free(pxConnState);
   
   return 0;
