@@ -20,6 +20,37 @@ static tBBWANT_ConnState* pxBBWANT_GetSetWebsockContext(tBBWANT_ConnState* pxCon
   return pxStoredConnState;
 }
 
+static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons reason,
+				   void *user, void *in, size_t len)
+{
+
+  switch (reason)
+  {
+  case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
+    lwsl_err("CLIENT_CONNECTION_ERROR: %s\n",
+	     in ? (char *)in : "(null)");
+    break;
+
+  default:
+    lwsl_notice("SOMETHING ELSE HAPPENET, PROBABLY NOT ERROR!\n");
+  }
+
+  return 0;
+}
+  
+
+static struct lws_protocols axBBWANT_WebsockProtocols[] =
+{
+  {
+    "whatsapp-nt-minimal-client",
+    iBBWANT_WebsockCallback,
+    0,
+    4000,
+  },
+  { NULL, NULL, 0, 0 }
+};
+
+
 static uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
 					   tBBWANT_ConnState* pxConnState)
 {
@@ -137,10 +168,27 @@ static uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOrig
     strncpy(pxConnState->sWebsockRealPathStore + 1, sParsedPath, BBWANT_URL_PATH_SIZE - 2);
     pxConnState->pxWsClientConnectInfo->path = pxConnState->sWebsockRealPathStore;
 
-    
+    pxConnState->pxWsContextCreationInfo->port = CONTEXT_PORT_NO_LISTEN;
+    pxConnState->pxWsContextCreationInfo->protocols = axBBWANT_WebsockProtocols;
+    pxConnState->pxWsContextCreationInfo->gid = -1;
+    pxConnState->pxWsContextCreationInfo->uid = -1;
 
+    pxConnState->pxWsContext = lws_create_context(pxConnState->pxWsContextCreationInfo);
+
+    if (pxConnState->pxWsContext == NULL)
+    {
+      free(pxConnState->pxWsClientConnectInfo);
+      free(pxConnState->sWebsockRealPathStore);
+      free(pxConnState->sWebsockOriginUrlStore);
+      free(pxConnState->sWebsockUrlPartStore);
+      free(pxConnState);
+      u8RetVal = BBWANT_ERROR;
+    }
+    else
+    {
+      pxConnState->pxWsClientConnectInfo->context = pxConnState->pxWsContext;
+    }
   }
-  
   
   return u8RetVal;
 }
