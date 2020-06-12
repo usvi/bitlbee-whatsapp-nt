@@ -67,3 +67,9 @@ to Ubuntu 16.04 to continue development though.
 
 It seems Whatsapp Web version keeps changing, so keep it configurable
 easily.
+
+Damn, things are getting so fragmented if we keep clinging on
+Ubuntu 16.04 LTS. We already needed, or "needed" external curve 25519 and
+base64 libraries. A big problem will be possible SSL certificate
+verification and extraction.
+

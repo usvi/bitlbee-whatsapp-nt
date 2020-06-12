@@ -13,6 +13,7 @@
 #define BBWANT_QR_HELLO_TEST_URL "https://www.google.com/search?q=hello+world"
 
 
+
 typedef struct
 {
   uint8_t u8ParamQrHelloTest;
