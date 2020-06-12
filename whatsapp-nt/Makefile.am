@@ -58,6 +58,9 @@ bbwhatsapp_nt_client_LDFLAGS = \
 	$(QRENCODE_LIBS) \
 	$(PNG_LIBS)
 
+bbwhatsapp_nt_client_CFLAGS = \
+	-Wall
+
 bbwhatsapp_nt_client_SOURCES = \
 	bbwant.h \
 	bbwant-curve25519-donna.c \

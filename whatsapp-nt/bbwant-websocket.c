@@ -41,6 +41,8 @@ static tBBWANT_ConnState* pxBBWANT_GetSetWebsockContext(tBBWANT_ConnState* pxCon
 
 static uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, tBBWANT_ConnState* pxConnState)
 {
+  // Everything needs to be malloced and zeroed.
+  pxConnState = malloc(sizeof(tBBWANT_ConnState));
   // We need to malloc all of these eventually
   /*
   memset(&gxBBWANT_ClientConnectInfo, 0, sizeof(gxBBWANT_ClientConnectInfo));
