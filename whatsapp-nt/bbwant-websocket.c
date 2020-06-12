@@ -51,6 +51,7 @@ static struct lws_protocols axBBWANT_WebsockProtocols[] =
   { NULL, NULL, 0, 0 }
 };
 
+/*
 static const struct lws_extension axBBWANT_WebsockExts[] =
 {
   {
@@ -63,10 +64,10 @@ static const struct lws_extension axBBWANT_WebsockExts[] =
     lws_extension_callback_pm_deflate,
     "deflate_frame"
   },
-  { NULL, NULL, NULL /* terminator */ }
+  { NULL, NULL, NULL }
 };
-    
-static uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
+*/  
+uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
 					   tBBWANT_ConnState* pxConnState)
 {
   // Everything needs to be malloced and zeroed.
@@ -206,14 +207,14 @@ static uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOrig
       pxConnState->pxWsClientConnectInfo->host = pxConnState->pxWsClientConnectInfo->address;
       pxConnState->pxWsClientConnectInfo->origin = pxConnState->sWebsockOriginUrlStore;
       pxConnState->pxWsClientConnectInfo->ietf_version_or_minus_one = -1;
-      pxConnState->pxWsClientConnectInfo->client_exts = axBBWANT_WebsockExts;
+      //pxConnState->pxWsClientConnectInfo->client_exts = axBBWANT_WebsockExts;
     }
   }
   
   return u8RetVal;
 }
 
-static uint8_t u8BBWANT_FreeConnection(tBBWANT_ConnState* pxConnState)
+uint8_t u8BBWANT_FreeConnection(tBBWANT_ConnState* pxConnState)
 {
   free(pxConnState->pxWsClientConnectInfo);
   free(pxConnState->sWebsockRealPathStore);
