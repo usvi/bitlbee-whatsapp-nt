@@ -22,9 +22,7 @@ typedef struct
 
 uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
 					   tBBWANT_ConnState* pxConnState);
-
 uint8_t u8BBWANT_FreeConnection(tBBWANT_ConnState* pxConnState);
-
-  
+tBBWANT_ConnState* pxBBWANT_GetSetWebsockContext(tBBWANT_ConnState* pxConnState);  
 
 #endif // #ifndef _BBWANT_WEBSOCKET_H_

@@ -1,6 +1,7 @@
 #include "bbwant-client.h"
 #include "bbwant.h"
 #include "bbwant-client-qrencode.h"
+#include "bbwant-websocket.h"
 
 #include <stdio.h>
 #include <stdint.h>
@@ -105,6 +106,7 @@ static uint8_t u8BBWANT_Client_MakeQrHelloTest(tBBWANT_Client_State* pxClientSta
 
 uint8_t u8BBWANT_Client_Default_Actions(tBBWANT_Client_State* pxClientState)
 {
+  
   
 
   return 0;

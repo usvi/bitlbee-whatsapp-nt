@@ -7,8 +7,8 @@
 #include <stdlib.h>
 
 
-/*
-static tBBWANT_ConnState* pxBBWANT_GetSetWebsockContext(tBBWANT_ConnState* pxConnState)
+
+tBBWANT_ConnState* pxBBWANT_GetSetWebsockContext(tBBWANT_ConnState* pxConnState)
 {
   static tBBWANT_ConnState* pxStoredConnState = NULL;
 
@@ -19,7 +19,7 @@ static tBBWANT_ConnState* pxBBWANT_GetSetWebsockContext(tBBWANT_ConnState* pxCon
 
   return pxStoredConnState;
 }
-*/
+
 
 static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons reason,
 				   void *user, void *in, size_t len)
