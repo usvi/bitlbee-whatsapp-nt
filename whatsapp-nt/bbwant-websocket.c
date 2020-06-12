@@ -6,26 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-/*
-static struct lws_client_connect_info gxBBWANT_ClientConnectInfo;
-static struct lws_context_creation_info gxBBWANT_ContextCreationInfo;
-*/
 
-/*
-struct lws_client_connect_info {
-    struct lws_context * context;
-    const char * address;
-    int port;
-    int ssl_connection;
-    const char * path;
-    const char * host;
-    const char * origin;
-    const char * protocol;
-    int ietf_version_or_minus_one;
-    void * userdata;
-    const struct lws_extension * client_exts;
-};
-*/
 
 static tBBWANT_ConnState* pxBBWANT_GetSetWebsockContext(tBBWANT_ConnState* pxConnState)
 {
@@ -44,7 +25,11 @@ static uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOrig
 {
   // Everything needs to be malloced and zeroed.
   uint8_t u8RetVal = BBWANT_OK;
+  const char* sParsedProto;
+  const char* sParsedPath;
+  int iTemp = 0;
     
+  
   pxConnState = NULL;
   pxConnState = malloc(sizeof(tBBWANT_ConnState));
 
@@ -75,10 +60,10 @@ static uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOrig
       }
       else
       {
-	pxConnState->pxWsClientConnectInfo = NULL;
-	pxConnState->pxWsClientConnectInfo = malloc(sizeof(struct lws_client_connect_info));
-	
-	if (pxConnState->pxWsClientConnectInfo == NULL)
+	pxConnState->sWebsockRealPathStore = NULL;
+	pxConnState->sWebsockRealPathStore = malloc(BBWANT_URL_PATH_SIZE);
+
+	if (pxConnState->sWebsockRealPathStore == NULL)
 	{
 	  free(pxConnState->sWebsockOriginUrlStore);
 	  free(pxConnState->sWebsockUrlPartStore);
@@ -87,16 +72,31 @@ static uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOrig
 	}
 	else
 	{
-	  pxConnState->pxWsContextCreationInfo = NULL;
-	  pxConnState->pxWsContextCreationInfo = malloc(sizeof(struct lws_context_creation_info));
-	  
-	  if (pxConnState->pxWsContextCreationInfo == NULL)
+	  pxConnState->pxWsClientConnectInfo = NULL;
+	  pxConnState->pxWsClientConnectInfo = malloc(sizeof(struct lws_client_connect_info));
+	
+	  if (pxConnState->pxWsClientConnectInfo == NULL)
 	  {
-	    free(pxConnState->pxWsClientConnectInfo);
+	    free(pxConnState->sWebsockRealPathStore);
 	    free(pxConnState->sWebsockOriginUrlStore);
 	    free(pxConnState->sWebsockUrlPartStore);
 	    free(pxConnState);
 	    u8RetVal = BBWANT_ERROR;
+	  }
+	  else
+	  {
+	    pxConnState->pxWsContextCreationInfo = NULL;
+	    pxConnState->pxWsContextCreationInfo = malloc(sizeof(struct lws_context_creation_info));
+	  
+	    if (pxConnState->pxWsContextCreationInfo == NULL)
+	    {
+	      free(pxConnState->pxWsClientConnectInfo);
+	      free(pxConnState->sWebsockRealPathStore);
+	      free(pxConnState->sWebsockOriginUrlStore);
+	      free(pxConnState->sWebsockUrlPartStore);
+	      free(pxConnState);
+	      u8RetVal = BBWANT_ERROR;
+	    }
 	  }
 	}
       }
@@ -105,9 +105,42 @@ static uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOrig
   // All malloc'd, good. Zero everything in one go.
   memset(pxConnState->sWebsockUrlPartStore, 0, BBWANT_URL_PATH_SIZE);
   memset(pxConnState->sWebsockOriginUrlStore, 0, BBWANT_URL_PATH_SIZE);
+  memset(pxConnState->sWebsockRealPathStore, 0, BBWANT_URL_PATH_SIZE);
   memset(pxConnState->pxWsClientConnectInfo, 0, sizeof(*(pxConnState->pxWsClientConnectInfo)));
   memset(pxConnState->pxWsContextCreationInfo, 0, sizeof(*(pxConnState->pxWsContextCreationInfo)));
   pxConnState->pxWsContext = NULL;
+
+  // And now, do somewhat what we saw in the original websockets library
+  // test-client.c
+  strncpy(pxConnState->sWebsockUrlPartStore, sWsUrl, BBWANT_URL_PATH_SIZE - 1);
+  strncpy(pxConnState->sWebsockOriginUrlStore, sOriginUrl, BBWANT_URL_PATH_SIZE - 1);
+
+  pxConnState->pxWsClientConnectInfo->port = BBWANT_DEFAULT_WS_PORT;
+  iTemp = lws_parse_uri(pxConnState->sWebsockUrlPartStore, &sParsedProto,
+			&(pxConnState->pxWsClientConnectInfo->address),
+			&(pxConnState->pxWsClientConnectInfo->port),
+			&sParsedPath);
+
+  if (iTemp != 0)
+  {
+    free(pxConnState->pxWsClientConnectInfo);
+    free(pxConnState->sWebsockRealPathStore);
+    free(pxConnState->sWebsockOriginUrlStore);
+    free(pxConnState->sWebsockUrlPartStore);
+    free(pxConnState);
+    u8RetVal = BBWANT_ERROR;
+  }
+  else
+  {
+    // Add back leading /
+    pxConnState->sWebsockRealPathStore[0] = '/';
+    strncpy(pxConnState->sWebsockRealPathStore + 1, sParsedPath, BBWANT_URL_PATH_SIZE - 2);
+    pxConnState->pxWsClientConnectInfo->path = pxConnState->sWebsockRealPathStore;
+
+    
+
+  }
+  
   
   return u8RetVal;
 }

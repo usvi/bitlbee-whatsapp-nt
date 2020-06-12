@@ -9,6 +9,7 @@ typedef struct
 {
   char* sWebsockUrlPartStore; // Gets mutilated eventually
   char* sWebsockOriginUrlStore;
+  char* sWebsockRealPathStore;
   struct lws_client_connect_info* pxWsClientConnectInfo;
   struct lws_context_creation_info* pxWsContextCreationInfo;
   struct lws_context* pxWsContext;
