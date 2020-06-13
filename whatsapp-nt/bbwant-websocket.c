@@ -24,6 +24,15 @@ tBBWANT_ConnState* pxBBWANT_GetSetWebsockContext(tBBWANT_ConnState* pxConnState)
 static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons reason,
 				   void *user, void *in, size_t len)
 {
+  /*
+        LWS_CALLBACK_OPENSSL_LOAD_EXTRA_CLIENT_VERIFY_CERTS     = 21,
+        LWS_CALLBACK_OPENSSL_LOAD_EXTRA_SERVER_VERIFY_CERTS     = 22,
+        LWS_CALLBACK_OPENSSL_PERFORM_CLIENT_CERT_VERIFICATION   = 23,
+        LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER             = 24,
+        LWS_CALLBACK_CONFIRM_EXTENSION_OKAY                     = 25,
+        LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED         = 26,
+        LWS_CALLBACK_PROTOCOL_INIT                              = 27,
+  */
 
   switch (reason)
   {
@@ -32,8 +41,12 @@ static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons re
 	     in ? (char *)in : "(null)");
     break;
 
+  case LWS_CALLBACK_CLIENT_ESTABLISHED:
+    lwsl_notice("CONNE ESTABLISED\n");
+    break;
+
   default:
-    lwsl_notice("SOMETHING ELSE HAPPENET, PROBABLY NOT ERROR!\n");
+    lwsl_notice("SOMETHING ELSE HAPPENET, PROBABLY NOT ERROR %d!\n", reason);
   }
 
   return 0;
@@ -51,7 +64,7 @@ static struct lws_protocols axBBWANT_WebsockProtocols[] =
   { NULL, NULL, 0, 0 }
 };
 
-/*
+
 static const struct lws_extension axBBWANT_WebsockExts[] =
 {
   {
@@ -66,7 +79,7 @@ static const struct lws_extension axBBWANT_WebsockExts[] =
   },
   { NULL, NULL, NULL }
 };
-*/  
+
 uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
 					   tBBWANT_ConnState* pxConnState)
 {
@@ -207,21 +220,28 @@ uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
       pxConnState->pxWsClientConnectInfo->host = pxConnState->pxWsClientConnectInfo->address;
       pxConnState->pxWsClientConnectInfo->origin = pxConnState->sWebsockOriginUrlStore;
       pxConnState->pxWsClientConnectInfo->ietf_version_or_minus_one = -1;
-      //pxConnState->pxWsClientConnectInfo->client_exts = axBBWANT_WebsockExts;
+      pxConnState->pxWsClientConnectInfo->client_exts = axBBWANT_WebsockExts;
     }
   }
+  pxConnState->pxWsClientConnectInfo->protocol = axBBWANT_WebsockProtocols[0].name;
+  lws_client_connect_via_info(pxConnState->pxWsClientConnectInfo);
+
+  lws_service(pxConnState->pxWsClientConnectInfo->context, 1000);
   
   return u8RetVal;
 }
 
 uint8_t u8BBWANT_FreeConnection(tBBWANT_ConnState* pxConnState)
 {
-  free(pxConnState->pxWsClientConnectInfo);
+  lws_context_destroy(pxConnState->pxWsContext);
+
   free(pxConnState->sWebsockRealPathStore);
   free(pxConnState->sWebsockOriginUrlStore);
   free(pxConnState->sWebsockUrlPartStore);
+
   lws_context_destroy(pxConnState->pxWsContext);
+  free(pxConnState->pxWsClientConnectInfo);
   free(pxConnState);
-  
+
   return 0;
 }
