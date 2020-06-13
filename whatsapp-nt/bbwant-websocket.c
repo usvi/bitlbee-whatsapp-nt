@@ -155,7 +155,7 @@ static void BBWANT_WebsockPrintCbReason(enum lws_callback_reasons reason)
 static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons reason,
 				   void *user, void *in, size_t len)
 {
-  //BBWANT_WebsockPrintCbReason(reason);
+  BBWANT_WebsockPrintCbReason(reason);
   
   switch (reason)
   {
@@ -212,7 +212,7 @@ uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
   struct lws* pxConnectResult;
 
   gu8Connecting = 0;
-  lws_set_log_level(2047, NULL);
+  //lws_set_log_level(2047, NULL);
   
   
   pxNewConnState = malloc(sizeof(tBBWANT_ConnState));
@@ -328,6 +328,8 @@ uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
     pxNewConnState->pxWsContextCreationInfo->protocols = axBBWANT_WebsockProtocols;
     pxNewConnState->pxWsContextCreationInfo->gid = -1;
     pxNewConnState->pxWsContextCreationInfo->uid = -1;
+    // FIXME: Dynamicize this according to what websocket library we have.
+    //pxNewConnState->pxWsContextCreationInfo->options |= LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
 
     pxNewConnState->pxWsContext = lws_create_context(pxNewConnState->pxWsContextCreationInfo);
 
