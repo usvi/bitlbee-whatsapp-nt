@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+static uint8_t gu8Connecting;
 
 
 tBBWANT_ConnState* pxBBWANT_GetSetWebsockContext(tBBWANT_ConnState* pxConnState)
@@ -24,15 +25,15 @@ tBBWANT_ConnState* pxBBWANT_GetSetWebsockContext(tBBWANT_ConnState* pxConnState)
 static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons reason,
 				   void *user, void *in, size_t len)
 {
-
-  
   switch (reason)
   {
   case LWS_CALLBACK_ESTABLISHED:
     lwsl_notice("LWS_CALLBACK_ESTABLISHED\n");
+    gu8Connecting = 0;
     break;
   case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
-    lwsl_notice("WS_CALLBACK_CLIENT_CONNECTION_ERROR\n");
+    lwsl_notice("WS_CALLBACK_CLIENT_CONNECTION_ERROR %s\n", in == NULL ? "null" : (char*)in );
+    gu8Connecting = 0;
     break;
   case LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH:
     lwsl_notice("LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH\n");
@@ -193,7 +194,10 @@ uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
   const char* sParsedPath;
   int iTemp = 0;
   tBBWANT_ConnState* pxNewConnState = NULL;
+  struct lws* pxConnectResult;
 
+  gu8Connecting = 0;
+    
   pxNewConnState = malloc(sizeof(tBBWANT_ConnState));
 
   
@@ -307,6 +311,7 @@ uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
     pxNewConnState->pxWsContextCreationInfo->protocols = axBBWANT_WebsockProtocols;
     pxNewConnState->pxWsContextCreationInfo->gid = -1;
     pxNewConnState->pxWsContextCreationInfo->uid = -1;
+    pxNewConnState->pxWsContextCreationInfo->options = LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
 
     pxNewConnState->pxWsContext = lws_create_context(pxNewConnState->pxWsContextCreationInfo);
 
@@ -330,17 +335,16 @@ uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
     }
   }
   pxNewConnState->pxWsClientConnectInfo->protocol = axBBWANT_WebsockProtocols[0].name;
-  lws_client_connect_via_info(pxNewConnState->pxWsClientConnectInfo);
+  gu8Connecting = 1;
+  pxConnectResult = lws_client_connect_via_info(pxNewConnState->pxWsClientConnectInfo);
 
-  lws_service(pxNewConnState->pxWsClientConnectInfo->context, 1000);
-  lws_service(pxNewConnState->pxWsClientConnectInfo->context, 1000);
-  lws_service(pxNewConnState->pxWsClientConnectInfo->context, 1000);
-  lws_service(pxNewConnState->pxWsClientConnectInfo->context, 1000);
-  lws_service(pxNewConnState->pxWsClientConnectInfo->context, 1000);
-  lws_service(pxNewConnState->pxWsClientConnectInfo->context, 1000);
-  lws_service(pxNewConnState->pxWsClientConnectInfo->context, 1000);
-  lws_service(pxNewConnState->pxWsClientConnectInfo->context, 1000);
-
+  if (pxConnectResult != NULL)
+  {
+    while(gu8Connecting)
+    {
+      lws_service(pxNewConnState->pxWsClientConnectInfo->context, 25);
+    }
+  }
 
 
   return u8RetVal;
