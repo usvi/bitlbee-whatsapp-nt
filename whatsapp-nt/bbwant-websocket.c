@@ -155,6 +155,8 @@ static void BBWANT_WebsockPrintCbReason(enum lws_callback_reasons reason)
 static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons reason,
 				   void *user, void *in, size_t len)
 {
+  char** p;
+  
   BBWANT_WebsockPrintCbReason(reason);
   
   switch (reason)
@@ -164,6 +166,22 @@ static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons re
     break;
   case LWS_CALLBACK_CLIENT_ESTABLISHED:
     gu8Connecting = 0;
+    break;
+  case LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER:
+    p = (char **)in;
+
+    if (len < 100)
+    {
+      return 1;
+    }
+    *p += sprintf(*p, "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0\x0d\x0a");
+    *p += sprintf(*p, "DNT: 1\x0d\x0a");
+    *p += sprintf(*p, "Accept: /\x0d\x0a");
+    *p += sprintf(*p, "Accept-Language: en-US,en;q=0.5\x0d\x0a");
+    *p += sprintf(*p, "Accept-Encoding: gzip, deflate, br\x0d\x0a");
+
+    return 0;
+    
     break;
   default:
     break;
@@ -331,6 +349,12 @@ uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
     // FIXME: Dynamicize this according to what websocket library we have.
     //pxNewConnState->pxWsContextCreationInfo->options |= LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
 
+
+    //pxNewConnState->pxWsContextCreationInfo->options |= LWS_SERVER_OPTION_PEER_CERT_NOT_REQUIRED;
+    //pxNewConnState->pxWsContextCreationInfo->options |= LWS_SERVER_OPTION_SSL_ECDH;
+
+    
+    
     pxNewConnState->pxWsContext = lws_create_context(pxNewConnState->pxWsContextCreationInfo);
 
     if (pxNewConnState->pxWsContext == NULL)
@@ -345,9 +369,24 @@ uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
     else
     {
       pxNewConnState->pxWsClientConnectInfo->context = pxNewConnState->pxWsContext;
-      pxNewConnState->pxWsClientConnectInfo->ssl_connection = 2; // FIXME: Use dynamic
+
+
+      if (!strcmp(sParsedProto, "http") || !strcmp(sParsedProto, "ws"))
+      {
+	pxNewConnState->pxWsClientConnectInfo->ssl_connection = 0;
+
+      }
+      if (!strcmp(sParsedProto, "https") || !strcmp(sParsedProto, "wss"))
+      {
+	pxNewConnState->pxWsClientConnectInfo->ssl_connection = 2;
+      }
+      
+
       pxNewConnState->pxWsClientConnectInfo->host = pxNewConnState->pxWsClientConnectInfo->address;
       pxNewConnState->pxWsClientConnectInfo->origin = pxNewConnState->sWebsockOriginUrlStore;
+
+      lwsl_notice("Host: >%s<   Origin: >%s<    Path: >%s<\n", pxNewConnState->pxWsClientConnectInfo->host,
+		  pxNewConnState->pxWsClientConnectInfo->origin, pxNewConnState->pxWsClientConnectInfo->path);
       pxNewConnState->pxWsClientConnectInfo->ietf_version_or_minus_one = -1;
       pxNewConnState->pxWsClientConnectInfo->client_exts = axBBWANT_WebsockExts;
     }
