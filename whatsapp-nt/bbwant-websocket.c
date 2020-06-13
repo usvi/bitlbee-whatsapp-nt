@@ -197,7 +197,9 @@ uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
   struct lws* pxConnectResult;
 
   gu8Connecting = 0;
-    
+  lws_set_log_level(2047, NULL);
+  
+  
   pxNewConnState = malloc(sizeof(tBBWANT_ConnState));
 
   
