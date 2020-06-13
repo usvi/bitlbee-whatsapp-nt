@@ -311,7 +311,6 @@ uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
     pxNewConnState->pxWsContextCreationInfo->protocols = axBBWANT_WebsockProtocols;
     pxNewConnState->pxWsContextCreationInfo->gid = -1;
     pxNewConnState->pxWsContextCreationInfo->uid = -1;
-    pxNewConnState->pxWsContextCreationInfo->options = LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
 
     pxNewConnState->pxWsContext = lws_create_context(pxNewConnState->pxWsContextCreationInfo);
 
