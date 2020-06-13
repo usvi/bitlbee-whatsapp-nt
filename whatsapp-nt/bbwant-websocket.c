@@ -228,22 +228,14 @@ uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
 
 uint8_t u8BBWANT_FreeConnection(tBBWANT_ConnState* pxConnState)
 {
-  //free(pxConnState);
-  free(pxConnState->sWebsockUrlPartStore);
-
+  uint8_t u8RetVal = BBWANT_OK;
+  
   lws_context_destroy(pxConnState->pxWsContext);
-
-  /*
-  lws_context_destroy(pxConnState->pxWsClientConnectInfo->context);
-
+  free(pxConnState->pxWsClientConnectInfo);
   free(pxConnState->sWebsockRealPathStore);
   free(pxConnState->sWebsockOriginUrlStore);
   free(pxConnState->sWebsockUrlPartStore);
-
-  lws_context_destroy(pxConnState->pxWsContext);
-  free(pxConnState->pxWsClientConnectInfo);
   free(pxConnState);
-  */
 
-  return 0;
+  return u8RetVal;
 }
