@@ -73,3 +73,5 @@ Ubuntu 16.04 LTS. We already needed, or "needed" external curve 25519 and
 base64 libraries. A big problem will be possible SSL certificate
 verification and extraction.
 
+Good example:
+https://stackoverflow.com/questions/30904560/libwebsocket-client-example
