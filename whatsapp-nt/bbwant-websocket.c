@@ -25,19 +25,132 @@ static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons re
 				   void *user, void *in, size_t len)
 {
 
+  
   switch (reason)
   {
+  case LWS_CALLBACK_ESTABLISHED:
+    lwsl_notice("LWS_CALLBACK_ESTABLISHED\n");
+    break;
   case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
-    lwsl_err("CLIENT_CONNECTION_ERROR: %s\n",
-	     in ? (char *)in : "(null)");
+    lwsl_notice("WS_CALLBACK_CLIENT_CONNECTION_ERROR\n");
     break;
-
+  case LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH:
+    lwsl_notice("LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH\n");
+    break;
   case LWS_CALLBACK_CLIENT_ESTABLISHED:
-    lwsl_notice("CONNE ESTABLISED\n");
+    lwsl_notice("LWS_CALLBACK_CLIENT_ESTABLISHED\n");
     break;
-
+  case LWS_CALLBACK_CLOSED:
+    lwsl_notice("LWS_CALLBACK_CLOSED\n");
+    break;
+  case LWS_CALLBACK_CLOSED_HTTP:
+    lwsl_notice("LWS_CALLBACK_CLOSED_HTTP\n");
+    break;
+  case LWS_CALLBACK_RECEIVE:
+    lwsl_notice("LWS_CALLBACK_RECEIVE\n");
+    break;
+  case LWS_CALLBACK_RECEIVE_PONG:
+    lwsl_notice("LWS_CALLBACK_RECEIVE_PONG\n");
+    break;
+  case LWS_CALLBACK_CLIENT_RECEIVE:
+    lwsl_notice("LWS_CALLBACK_CLIENT_RECEIVE\n");
+    break;
+  case LWS_CALLBACK_CLIENT_RECEIVE_PONG:
+    lwsl_notice("LWS_CALLBACK_CLIENT_RECEIVE_PONG\n");
+    break;
+  case LWS_CALLBACK_CLIENT_WRITEABLE:
+    lwsl_notice("LWS_CALLBACK_CLIENT_WRITEABLE\n");
+    break;
+  case LWS_CALLBACK_SERVER_WRITEABLE:
+    lwsl_notice("LWS_CALLBACK_SERVER_WRITEABLE\n");
+    break;
+  case LWS_CALLBACK_HTTP:
+    lwsl_notice("LWS_CALLBACK_HTTP\n");
+    break;
+  case LWS_CALLBACK_HTTP_BODY:
+    lwsl_notice("LWS_CALLBACK_HTTP_BODY\n");
+    break;
+  case LWS_CALLBACK_HTTP_BODY_COMPLETION:
+    lwsl_notice("LWS_CALLBACK_HTTP_BODY_COMPLETION\n");
+    break;
+  case LWS_CALLBACK_HTTP_FILE_COMPLETION:
+    lwsl_notice("LWS_CALLBACK_HTTP_FILE_COMPLETION\n");
+    break;
+  case LWS_CALLBACK_HTTP_WRITEABLE:
+    lwsl_notice("LWS_CALLBACK_HTTP_WRITEABLE\n");
+    break;
+  case LWS_CALLBACK_FILTER_NETWORK_CONNECTION:
+    lwsl_notice("LWS_CALLBACK_FILTER_NETWORK_CONNECTION\n");
+    break;
+  case LWS_CALLBACK_FILTER_HTTP_CONNECTION:
+    lwsl_notice("LWS_CALLBACK_FILTER_HTTP_CONNECTION\n");
+    break;
+  case LWS_CALLBACK_SERVER_NEW_CLIENT_INSTANTIATED:
+    lwsl_notice("LWS_CALLBACK_SERVER_NEW_CLIENT_INSTANTIATED\n");
+    break;
+  case LWS_CALLBACK_FILTER_PROTOCOL_CONNECTION:
+    lwsl_notice("LWS_CALLBACK_FILTER_PROTOCOL_CONNECTION\n");
+    break;
+  case LWS_CALLBACK_OPENSSL_LOAD_EXTRA_CLIENT_VERIFY_CERTS:
+    lwsl_notice("LWS_CALLBACK_OPENSSL_LOAD_EXTRA_CLIENT_VERIFY_CERTS\n");
+    break;
+  case LWS_CALLBACK_OPENSSL_LOAD_EXTRA_SERVER_VERIFY_CERTS:
+    lwsl_notice("LWS_CALLBACK_OPENSSL_LOAD_EXTRA_SERVER_VERIFY_CERTS\n");
+    break;
+  case LWS_CALLBACK_OPENSSL_PERFORM_CLIENT_CERT_VERIFICATION:
+    lwsl_notice("LWS_CALLBACK_OPENSSL_PERFORM_CLIENT_CERT_VERIFICATION\n");
+    break;
+  case LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER:
+    lwsl_notice("LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER\n");
+    break;
+  case LWS_CALLBACK_CONFIRM_EXTENSION_OKAY:
+    lwsl_notice("LWS_CALLBACK_CONFIRM_EXTENSION_OKAY\n");
+    break;
+  case LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED:
+    lwsl_notice("LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED\n");
+    break;
+  case LWS_CALLBACK_PROTOCOL_INIT:
+    lwsl_notice("LWS_CALLBACK_PROTOCOL_INIT\n");
+    break;
+  case LWS_CALLBACK_PROTOCOL_DESTROY:
+    lwsl_notice("LWS_CALLBACK_PROTOCOL_DESTROY\n");
+    break;
+  case LWS_CALLBACK_WSI_CREATE:
+    lwsl_notice("LWS_CALLBACK_WSI_CREATE\n");
+    break;
+  case LWS_CALLBACK_WSI_DESTROY:
+    lwsl_notice("LWS_CALLBACK_WSI_DESTROY\n");
+    break;
+  case LWS_CALLBACK_GET_THREAD_ID:
+    lwsl_notice("LWS_CALLBACK_GET_THREAD_ID\n");
+    break;
+  case LWS_CALLBACK_ADD_POLL_FD:
+    lwsl_notice("LWS_CALLBACK_ADD_POLL_FD\n");
+    break;
+  case LWS_CALLBACK_DEL_POLL_FD:
+    lwsl_notice("LWS_CALLBACK_DEL_POLL_FD\n");
+    break;
+  case LWS_CALLBACK_CHANGE_MODE_POLL_FD:
+    lwsl_notice("LWS_CALLBACK_CHANGE_MODE_POLL_FD\n");
+    break;
+  case LWS_CALLBACK_LOCK_POLL:
+    lwsl_notice("LWS_CALLBACK_LOCK_POLL\n");
+    break;
+  case LWS_CALLBACK_UNLOCK_POLL:
+    lwsl_notice("LWS_CALLBACK_UNLOCK_POLL\n");
+    break;
+  case LWS_CALLBACK_OPENSSL_CONTEXT_REQUIRES_PRIVATE_KEY:
+    lwsl_notice("LWS_CALLBACK_OPENSSL_CONTEXT_REQUIRES_PRIVATE_KEY\n");
+    break;
+  case LWS_CALLBACK_WS_PEER_INITIATED_CLOSE:
+    lwsl_notice("LWS_CALLBACK_WS_PEER_INITIATED_CLOSE\n");
+    break;
+  case LWS_CALLBACK_WS_EXT_DEFAULTS:
+    lwsl_notice("LWS_CALLBACK_WS_EXT_DEFAULTS\n");
+    break;
+    
   default:
-    lwsl_notice("SOMETHING ELSE HAPPENET, PROBABLY NOT ERROR %d!\n", reason);
+    lwsl_notice("SOMETHING ELSE HAPPENED\n");
   }
 
   return 0;
