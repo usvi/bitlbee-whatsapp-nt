@@ -8,7 +8,8 @@ bbwhatsapp_nt_client_LDFLAGS = \
 	$(WEBSOCKETS_LIBS)
 
 bbwhatsapp_nt_client_CFLAGS = \
-	-Wall
+	-Wall \
+	-g
 
 bbwhatsapp_nt_client_SOURCES = \
 	bbwant.h \

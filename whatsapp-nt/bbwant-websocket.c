@@ -333,6 +333,13 @@ uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
   lws_client_connect_via_info(pxNewConnState->pxWsClientConnectInfo);
 
   lws_service(pxNewConnState->pxWsClientConnectInfo->context, 1000);
+  lws_service(pxNewConnState->pxWsClientConnectInfo->context, 1000);
+  lws_service(pxNewConnState->pxWsClientConnectInfo->context, 1000);
+  lws_service(pxNewConnState->pxWsClientConnectInfo->context, 1000);
+  lws_service(pxNewConnState->pxWsClientConnectInfo->context, 1000);
+  lws_service(pxNewConnState->pxWsClientConnectInfo->context, 1000);
+  lws_service(pxNewConnState->pxWsClientConnectInfo->context, 1000);
+  lws_service(pxNewConnState->pxWsClientConnectInfo->context, 1000);
 
 
 
@@ -344,6 +351,7 @@ uint8_t u8BBWANT_FreeConnection(tBBWANT_ConnState* pxConnState)
   uint8_t u8RetVal = BBWANT_OK;
   
   lws_context_destroy(pxConnState->pxWsContext);
+  free(pxConnState->pxWsContextCreationInfo);
   free(pxConnState->pxWsClientConnectInfo);
   free(pxConnState->sWebsockRealPathStore);
   free(pxConnState->sWebsockOriginUrlStore);
