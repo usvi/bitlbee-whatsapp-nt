@@ -21,9 +21,7 @@ tBBWANT_ConnState* pxBBWANT_GetSetWebsockContext(tBBWANT_ConnState* pxConnState)
   return pxStoredConnState;
 }
 
-
-static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons reason,
-				   void *user, void *in, size_t len)
+static void BBWANT_WebsockPrintCbReason(enum lws_callback_reasons reason)
 {
   switch (reason)
   {
@@ -31,15 +29,13 @@ static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons re
     lwsl_notice("LWS_CALLBACK_ESTABLISHED\n");
     break;
   case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
-    lwsl_notice("WS_CALLBACK_CLIENT_CONNECTION_ERROR %s\n", in == NULL ? "null" : (char*)in );
-    gu8Connecting = 0;
+    lwsl_notice("WS_CALLBACK_CLIENT_CONNECTION_ERROR\n");
     break;
   case LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH:
     lwsl_notice("LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH\n");
     break;
   case LWS_CALLBACK_CLIENT_ESTABLISHED:
     lwsl_notice("LWS_CALLBACK_CLIENT_ESTABLISHED\n");
-    gu8Connecting = 0;
     break;
   case LWS_CALLBACK_CLOSED:
     lwsl_notice("LWS_CALLBACK_CLOSED\n");
@@ -149,9 +145,28 @@ static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons re
   case LWS_CALLBACK_WS_EXT_DEFAULTS:
     lwsl_notice("LWS_CALLBACK_WS_EXT_DEFAULTS\n");
     break;
-    
   default:
     lwsl_notice("SOMETHING ELSE HAPPENED\n");
+  }
+
+}
+
+
+static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons reason,
+				   void *user, void *in, size_t len)
+{
+  BBWANT_WebsockPrintCbReason(reason);
+  
+  switch (reason)
+  {
+  case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
+    gu8Connecting = 0;
+    break;
+  case LWS_CALLBACK_CLIENT_ESTABLISHED:
+    gu8Connecting = 0;
+    break;
+  default:
+    break;
   }
 
   return 0;
