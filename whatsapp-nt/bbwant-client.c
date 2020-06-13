@@ -107,13 +107,15 @@ static uint8_t u8BBWANT_Client_MakeQrHelloTest(tBBWANT_Client_State* pxClientSta
 uint8_t u8BBWANT_Client_Default_Actions(tBBWANT_Client_State* pxClientState)
 {
   uint8_t u8RetVal = BBWANT_OK;
-  tBBWANT_ConnState xTempConnection;
+  tBBWANT_ConnState* pxTempConnection;
 
-  u8RetVal = u8BBWANT_AllocateConnection("wss://web.whatsapp.com/ws", "https://web.whatsapp.com", &xTempConnection);
+  u8RetVal = u8BBWANT_AllocateConnection("wss://web.whatsapp.com/ws",
+					 "https://web.whatsapp.com",
+					 &pxTempConnection);
 
   printf("Retval was %u\n", u8RetVal);
   
-    //u8BBWANT_FreeConnection(&xTempConnection);
+    u8BBWANT_FreeConnection(pxTempConnection);
   
 
   return 0;

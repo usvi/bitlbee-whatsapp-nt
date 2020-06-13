@@ -24,15 +24,6 @@ tBBWANT_ConnState* pxBBWANT_GetSetWebsockContext(tBBWANT_ConnState* pxConnState)
 static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons reason,
 				   void *user, void *in, size_t len)
 {
-  /*
-        LWS_CALLBACK_OPENSSL_LOAD_EXTRA_CLIENT_VERIFY_CERTS     = 21,
-        LWS_CALLBACK_OPENSSL_LOAD_EXTRA_SERVER_VERIFY_CERTS     = 22,
-        LWS_CALLBACK_OPENSSL_PERFORM_CLIENT_CERT_VERIFICATION   = 23,
-        LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER             = 24,
-        LWS_CALLBACK_CONFIRM_EXTENSION_OKAY                     = 25,
-        LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED         = 26,
-        LWS_CALLBACK_PROTOCOL_INIT                              = 27,
-  */
 
   switch (reason)
   {
@@ -81,80 +72,82 @@ static const struct lws_extension axBBWANT_WebsockExts[] =
 };
 
 uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
-					   tBBWANT_ConnState* pxConnState)
+					   tBBWANT_ConnState** ppxConnState)
 {
   // Everything needs to be malloced and zeroed.
   uint8_t u8RetVal = BBWANT_OK;
   const char* sParsedProto;
   const char* sParsedPath;
   int iTemp = 0;
-    
-  
-  pxConnState = NULL;
-  pxConnState = malloc(sizeof(tBBWANT_ConnState));
+  tBBWANT_ConnState* pxNewConnState = NULL;
 
-  if (pxConnState == NULL)
+  pxNewConnState = malloc(sizeof(tBBWANT_ConnState));
+
+  
+  if (pxNewConnState == NULL)
   {
     u8RetVal = BBWANT_ERROR;
   }
   else
   {
-    pxConnState->sWebsockUrlPartStore = NULL;
-    pxConnState->sWebsockUrlPartStore = malloc(BBWANT_URL_PATH_SIZE);
+    // Creation successful, so assign pointer for exporting the stuff
+    *ppxConnState = pxNewConnState;
+    pxNewConnState->sWebsockUrlPartStore = NULL;
+    pxNewConnState->sWebsockUrlPartStore = malloc(BBWANT_URL_PATH_SIZE);
 
-    if (pxConnState->sWebsockUrlPartStore == NULL)
+    if (pxNewConnState->sWebsockUrlPartStore == NULL)
     {
-      free(pxConnState);
+      free(pxNewConnState);
       u8RetVal = BBWANT_ERROR;
     }
     else
     {
-      pxConnState->sWebsockOriginUrlStore = NULL;
-      pxConnState->sWebsockOriginUrlStore = malloc(BBWANT_URL_PATH_SIZE);
+      pxNewConnState->sWebsockOriginUrlStore = NULL;
+      pxNewConnState->sWebsockOriginUrlStore = malloc(BBWANT_URL_PATH_SIZE);
 
-      if (pxConnState->sWebsockOriginUrlStore == NULL)
+      if (pxNewConnState->sWebsockOriginUrlStore == NULL)
       {
-	free(pxConnState->sWebsockUrlPartStore);
-	free(pxConnState);
+	free(pxNewConnState->sWebsockUrlPartStore);
+	free(pxNewConnState);
 	u8RetVal = BBWANT_ERROR;
       }
       else
       {
-	pxConnState->sWebsockRealPathStore = NULL;
-	pxConnState->sWebsockRealPathStore = malloc(BBWANT_URL_PATH_SIZE);
+	pxNewConnState->sWebsockRealPathStore = NULL;
+	pxNewConnState->sWebsockRealPathStore = malloc(BBWANT_URL_PATH_SIZE);
 
-	if (pxConnState->sWebsockRealPathStore == NULL)
+	if (pxNewConnState->sWebsockRealPathStore == NULL)
 	{
-	  free(pxConnState->sWebsockOriginUrlStore);
-	  free(pxConnState->sWebsockUrlPartStore);
-	  free(pxConnState);
+	  free(pxNewConnState->sWebsockOriginUrlStore);
+	  free(pxNewConnState->sWebsockUrlPartStore);
+	  free(pxNewConnState);
 	  u8RetVal = BBWANT_ERROR;
 	}
 	else
 	{
-	  pxConnState->pxWsClientConnectInfo = NULL;
-	  pxConnState->pxWsClientConnectInfo = malloc(sizeof(struct lws_client_connect_info));
+	  pxNewConnState->pxWsClientConnectInfo = NULL;
+	  pxNewConnState->pxWsClientConnectInfo = malloc(sizeof(struct lws_client_connect_info));
 	
-	  if (pxConnState->pxWsClientConnectInfo == NULL)
+	  if (pxNewConnState->pxWsClientConnectInfo == NULL)
 	  {
-	    free(pxConnState->sWebsockRealPathStore);
-	    free(pxConnState->sWebsockOriginUrlStore);
-	    free(pxConnState->sWebsockUrlPartStore);
-	    free(pxConnState);
+	    free(pxNewConnState->sWebsockRealPathStore);
+	    free(pxNewConnState->sWebsockOriginUrlStore);
+	    free(pxNewConnState->sWebsockUrlPartStore);
+	    free(pxNewConnState);
 	    u8RetVal = BBWANT_ERROR;
 	  }
 	  else
 	  {
-	    pxConnState->pxWsContextCreationInfo = NULL;
-	    pxConnState->pxWsContextCreationInfo = malloc(sizeof(struct lws_context_creation_info));
+	    pxNewConnState->pxWsContextCreationInfo = NULL;
+	    pxNewConnState->pxWsContextCreationInfo = malloc(sizeof(struct lws_context_creation_info));
 	  
-	    if (pxConnState->pxWsContextCreationInfo == NULL)
+	    if (pxNewConnState->pxWsContextCreationInfo == NULL)
 	    {
-	      free(pxConnState->pxWsClientConnectInfo);
-	      free(pxConnState->sWebsockRealPathStore);
-	      free(pxConnState->sWebsockOriginUrlStore);
-	      free(pxConnState->sWebsockUrlPartStore);
-	      free(pxConnState);
+	      free(pxNewConnState->pxWsClientConnectInfo);
+	      free(pxNewConnState->sWebsockRealPathStore);
+	      free(pxNewConnState->sWebsockOriginUrlStore);
+	      free(pxNewConnState->sWebsockUrlPartStore);
+	      free(pxNewConnState);
 	      u8RetVal = BBWANT_ERROR;
 	    }
 	  }
@@ -163,77 +156,85 @@ uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
     }
   }
   // All malloc'd, good. Zero everything in one go.
-  memset(pxConnState->sWebsockUrlPartStore, 0, BBWANT_URL_PATH_SIZE);
-  memset(pxConnState->sWebsockOriginUrlStore, 0, BBWANT_URL_PATH_SIZE);
-  memset(pxConnState->sWebsockRealPathStore, 0, BBWANT_URL_PATH_SIZE);
-  memset(pxConnState->pxWsClientConnectInfo, 0, sizeof(*(pxConnState->pxWsClientConnectInfo)));
-  memset(pxConnState->pxWsContextCreationInfo, 0, sizeof(*(pxConnState->pxWsContextCreationInfo)));
-  pxConnState->pxWsContext = NULL;
+  memset(pxNewConnState->sWebsockUrlPartStore, 0, BBWANT_URL_PATH_SIZE);
+  memset(pxNewConnState->sWebsockOriginUrlStore, 0, BBWANT_URL_PATH_SIZE);
+  memset(pxNewConnState->sWebsockRealPathStore, 0, BBWANT_URL_PATH_SIZE);
+  memset(pxNewConnState->pxWsClientConnectInfo, 0, sizeof(*(pxNewConnState->pxWsClientConnectInfo)));
+  memset(pxNewConnState->pxWsContextCreationInfo, 0, sizeof(*(pxNewConnState->pxWsContextCreationInfo)));
+  pxNewConnState->pxWsContext = NULL;
 
   // And now, do somewhat what we saw in the original websockets library
   // test-client.c
-  strncpy(pxConnState->sWebsockUrlPartStore, sWsUrl, BBWANT_URL_PATH_SIZE - 1);
-  strncpy(pxConnState->sWebsockOriginUrlStore, sOriginUrl, BBWANT_URL_PATH_SIZE - 1);
+  strncpy(pxNewConnState->sWebsockUrlPartStore, sWsUrl, BBWANT_URL_PATH_SIZE - 1);
+  strncpy(pxNewConnState->sWebsockOriginUrlStore, sOriginUrl, BBWANT_URL_PATH_SIZE - 1);
 
-  pxConnState->pxWsClientConnectInfo->port = BBWANT_DEFAULT_WS_PORT;
-  iTemp = lws_parse_uri(pxConnState->sWebsockUrlPartStore, &sParsedProto,
-			&(pxConnState->pxWsClientConnectInfo->address),
-			&(pxConnState->pxWsClientConnectInfo->port),
+  pxNewConnState->pxWsClientConnectInfo->port = BBWANT_DEFAULT_WS_PORT;
+  iTemp = lws_parse_uri(pxNewConnState->sWebsockUrlPartStore, &sParsedProto,
+			&(pxNewConnState->pxWsClientConnectInfo->address),
+			&(pxNewConnState->pxWsClientConnectInfo->port),
 			&sParsedPath);
 
   if (iTemp != 0)
   {
-    free(pxConnState->pxWsClientConnectInfo);
-    free(pxConnState->sWebsockRealPathStore);
-    free(pxConnState->sWebsockOriginUrlStore);
-    free(pxConnState->sWebsockUrlPartStore);
-    free(pxConnState);
+    free(pxNewConnState->pxWsClientConnectInfo);
+    free(pxNewConnState->sWebsockRealPathStore);
+    free(pxNewConnState->sWebsockOriginUrlStore);
+    free(pxNewConnState->sWebsockUrlPartStore);
+    free(pxNewConnState);
     u8RetVal = BBWANT_ERROR;
   }
   else
   {
     // Add back leading /
-    pxConnState->sWebsockRealPathStore[0] = '/';
-    strncpy(pxConnState->sWebsockRealPathStore + 1, sParsedPath, BBWANT_URL_PATH_SIZE - 2);
-    pxConnState->pxWsClientConnectInfo->path = pxConnState->sWebsockRealPathStore;
+    pxNewConnState->sWebsockRealPathStore[0] = '/';
+    strncpy(pxNewConnState->sWebsockRealPathStore + 1, sParsedPath, BBWANT_URL_PATH_SIZE - 2);
+    pxNewConnState->pxWsClientConnectInfo->path = pxNewConnState->sWebsockRealPathStore;
 
-    pxConnState->pxWsContextCreationInfo->port = CONTEXT_PORT_NO_LISTEN;
-    pxConnState->pxWsContextCreationInfo->protocols = axBBWANT_WebsockProtocols;
-    pxConnState->pxWsContextCreationInfo->gid = -1;
-    pxConnState->pxWsContextCreationInfo->uid = -1;
+    pxNewConnState->pxWsContextCreationInfo->port = CONTEXT_PORT_NO_LISTEN;
+    pxNewConnState->pxWsContextCreationInfo->protocols = axBBWANT_WebsockProtocols;
+    pxNewConnState->pxWsContextCreationInfo->gid = -1;
+    pxNewConnState->pxWsContextCreationInfo->uid = -1;
 
-    pxConnState->pxWsContext = lws_create_context(pxConnState->pxWsContextCreationInfo);
+    pxNewConnState->pxWsContext = lws_create_context(pxNewConnState->pxWsContextCreationInfo);
 
-    if (pxConnState->pxWsContext == NULL)
+    if (pxNewConnState->pxWsContext == NULL)
     {
-      free(pxConnState->pxWsClientConnectInfo);
-      free(pxConnState->sWebsockRealPathStore);
-      free(pxConnState->sWebsockOriginUrlStore);
-      free(pxConnState->sWebsockUrlPartStore);
-      free(pxConnState);
+      free(pxNewConnState->pxWsClientConnectInfo);
+      free(pxNewConnState->sWebsockRealPathStore);
+      free(pxNewConnState->sWebsockOriginUrlStore);
+      free(pxNewConnState->sWebsockUrlPartStore);
+      free(pxNewConnState);
       u8RetVal = BBWANT_ERROR;
     }
     else
     {
-      pxConnState->pxWsClientConnectInfo->context = pxConnState->pxWsContext;
-      pxConnState->pxWsClientConnectInfo->ssl_connection = 1; // FIXME: Use dynamic
-      pxConnState->pxWsClientConnectInfo->host = pxConnState->pxWsClientConnectInfo->address;
-      pxConnState->pxWsClientConnectInfo->origin = pxConnState->sWebsockOriginUrlStore;
-      pxConnState->pxWsClientConnectInfo->ietf_version_or_minus_one = -1;
-      pxConnState->pxWsClientConnectInfo->client_exts = axBBWANT_WebsockExts;
+      pxNewConnState->pxWsClientConnectInfo->context = pxNewConnState->pxWsContext;
+      pxNewConnState->pxWsClientConnectInfo->ssl_connection = 2; // FIXME: Use dynamic
+      pxNewConnState->pxWsClientConnectInfo->host = pxNewConnState->pxWsClientConnectInfo->address;
+      pxNewConnState->pxWsClientConnectInfo->origin = pxNewConnState->sWebsockOriginUrlStore;
+      pxNewConnState->pxWsClientConnectInfo->ietf_version_or_minus_one = -1;
+      pxNewConnState->pxWsClientConnectInfo->client_exts = axBBWANT_WebsockExts;
     }
   }
-  pxConnState->pxWsClientConnectInfo->protocol = axBBWANT_WebsockProtocols[0].name;
-  lws_client_connect_via_info(pxConnState->pxWsClientConnectInfo);
+  pxNewConnState->pxWsClientConnectInfo->protocol = axBBWANT_WebsockProtocols[0].name;
+  lws_client_connect_via_info(pxNewConnState->pxWsClientConnectInfo);
 
-  lws_service(pxConnState->pxWsClientConnectInfo->context, 1000);
-  
+  lws_service(pxNewConnState->pxWsClientConnectInfo->context, 1000);
+
+
+
   return u8RetVal;
 }
 
 uint8_t u8BBWANT_FreeConnection(tBBWANT_ConnState* pxConnState)
 {
+  //free(pxConnState);
+  free(pxConnState->sWebsockUrlPartStore);
+
   lws_context_destroy(pxConnState->pxWsContext);
+
+  /*
+  lws_context_destroy(pxConnState->pxWsClientConnectInfo->context);
 
   free(pxConnState->sWebsockRealPathStore);
   free(pxConnState->sWebsockOriginUrlStore);
@@ -242,6 +243,7 @@ uint8_t u8BBWANT_FreeConnection(tBBWANT_ConnState* pxConnState)
   lws_context_destroy(pxConnState->pxWsContext);
   free(pxConnState->pxWsClientConnectInfo);
   free(pxConnState);
+  */
 
   return 0;
 }
