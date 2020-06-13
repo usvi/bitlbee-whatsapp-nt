@@ -29,7 +29,6 @@ static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons re
   {
   case LWS_CALLBACK_ESTABLISHED:
     lwsl_notice("LWS_CALLBACK_ESTABLISHED\n");
-    gu8Connecting = 0;
     break;
   case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
     lwsl_notice("WS_CALLBACK_CLIENT_CONNECTION_ERROR %s\n", in == NULL ? "null" : (char*)in );
@@ -40,6 +39,7 @@ static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons re
     break;
   case LWS_CALLBACK_CLIENT_ESTABLISHED:
     lwsl_notice("LWS_CALLBACK_CLIENT_ESTABLISHED\n");
+    gu8Connecting = 0;
     break;
   case LWS_CALLBACK_CLOSED:
     lwsl_notice("LWS_CALLBACK_CLOSED\n");

@@ -78,3 +78,6 @@ https://stackoverflow.com/questions/30904560/libwebsocket-client-example
 
 Probably even better example:
 https://github.com/iamscottmoyers/simple-libwebsockets-example/blob/master/client.c
+
+Ok nice, it seems https://www.websocket.org/echo.html works with current implemation.
+And the current Whatsapp connection does not.
