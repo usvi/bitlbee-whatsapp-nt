@@ -75,3 +75,6 @@ verification and extraction.
 
 Good example:
 https://stackoverflow.com/questions/30904560/libwebsocket-client-example
+
+Probably even better example:
+https://github.com/iamscottmoyers/simple-libwebsockets-example/blob/master/client.c
