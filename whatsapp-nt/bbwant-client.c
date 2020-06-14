@@ -107,8 +107,10 @@ static uint8_t u8BBWANT_Client_MakeQrHelloTest(tBBWANT_Client_State* pxClientSta
 uint8_t u8BBWANT_Client_Default_Actions(tBBWANT_Client_State* pxClientState)
 {
   uint8_t u8RetVal = BBWANT_OK;
+  uint16_t u16AppDirResult = 0;
+  
+  /*
   tBBWANT_ConnState* pxTempConnection;
-
   u8RetVal = u8BBWANT_Websocket_AllocateConnection(&pxTempConnection);
 
   if (u8RetVal != BBWANT_OK)
@@ -139,7 +141,10 @@ uint8_t u8BBWANT_Client_Default_Actions(tBBWANT_Client_State* pxClientState)
   }
   
   u8BBWANT_Websocket_FreeConnection(pxTempConnection);
+  */
 
+  u8BBWANT_Userdir_AnalyzeStructure(&u16AppDirResult);
+  
   return u8RetVal;
 }
 
