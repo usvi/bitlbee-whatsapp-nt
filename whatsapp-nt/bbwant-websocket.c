@@ -9,13 +9,13 @@
 static uint8_t gu8Connecting;
 
 
-tBBWANT_ConnState* pxBBWANT_GetSetWebsockContext(tBBWANT_ConnState* pxConnState)
+tBBWANT_ConnState* pxBBWANT_GetSetWebsockContext(tBBWANT_ConnState** ppxConnState)
 {
   static tBBWANT_ConnState* pxStoredConnState = NULL;
 
-  if (pxConnState != NULL)
+  if (ppxConnState != NULL)
   {
-    pxStoredConnState = pxConnState;
+    pxStoredConnState = *ppxConnState;
   }
 
   return pxStoredConnState;
@@ -155,9 +155,7 @@ static void BBWANT_WebsockPrintCbReason(enum lws_callback_reasons reason)
 static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons reason,
 				   void *user, void *in, size_t len)
 {
-  char** p;
-  
-  BBWANT_WebsockPrintCbReason(reason);
+  //BBWANT_WebsockPrintCbReason(reason);
   
   switch (reason)
   {
@@ -168,20 +166,6 @@ static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons re
     gu8Connecting = 0;
     break;
   case LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER:
-    p = (char **)in;
-
-    if (len < 100)
-    {
-      return 1;
-    }
-    *p += sprintf(*p, "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0\x0d\x0a");
-    *p += sprintf(*p, "DNT: 1\x0d\x0a");
-    *p += sprintf(*p, "Accept: /\x0d\x0a");
-    *p += sprintf(*p, "Accept-Language: en-US,en;q=0.5\x0d\x0a");
-    *p += sprintf(*p, "Accept-Encoding: gzip, deflate, br\x0d\x0a");
-
-    return 0;
-    
     break;
   default:
     break;
@@ -242,8 +226,11 @@ uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
   }
   else
   {
-    // Creation successful, so assign pointer for exporting the stuff
+    // Creation successful, so assign pointer for exporting and storing the stuff
+        // Fixme: Later make this more sane, so that caller stores it.
     *ppxConnState = pxNewConnState;
+    pxBBWANT_GetSetWebsockContext(ppxConnState);
+
     pxNewConnState->sWebsockUrlPartStore = NULL;
     pxNewConnState->sWebsockUrlPartStore = malloc(BBWANT_URL_PATH_SIZE);
 
