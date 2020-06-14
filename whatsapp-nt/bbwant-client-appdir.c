@@ -8,7 +8,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <dirent.h>
-
+#include <sys/stat.h>
 
 #define BBWANT_CLIENT_APPDIR_PROTOFILE "protoversion"
 
@@ -36,14 +36,19 @@ static uint8_t u8BBWANT_Client_Appdir_GetPath(char* sAppUserdir)
   return u8RetVal;
 }
 
-uint8_t u8BBWANT_Client_Appdir_AnalyzeStructure(uint16_t* pu16Result)
+
+
+
+
+uint8_t u8BBWANT_Client_Appdir_CreateMissingResources(void)
 {
   uint8_t u8RetVal = BBWANT_OK;
   char sBuf1[BBWANT_FILE_PATH_SIZE] = { 0 };
   char sBuf2[BBWANT_FILE_PATH_SIZE] = { 0 };
   DIR* pDir = NULL;
-
-  *pu16Result = 0;
+  int iTemp = 0;
+  FILE* pProtofile = NULL;
+  
   u8RetVal = u8BBWANT_Client_Appdir_GetPath(sBuf1);
 
   if (u8RetVal == BBWANT_ERROR)
@@ -52,34 +57,75 @@ uint8_t u8BBWANT_Client_Appdir_AnalyzeStructure(uint16_t* pu16Result)
   }
   else
   {
-    // Check if the whole directory exists
+    // Check if the whole directory even exists
     pDir = opendir(sBuf1);
 
     if (pDir == NULL)
+    {
+      // Does not exist. Needs to be created.
+      printf("Creating directory %s   ", sBuf1);
+      iTemp = mkdir(sBuf1, 0777);
+
+      if (iTemp == -1)
+      {
+	printf("failed\n");
+	u8RetVal = BBWANT_ERROR;
+      }
+      else
+      {
+	printf("ok\n");
+      }
+    }
+    closedir(pDir);
+    
+    if (u8RetVal == BBWANT_ERROR)
     {
       ;
     }
     else
     {
-      *pu16Result |= BBWANT_CLIENT_APPDIR_DIR_EXISTS;
-      closedir(pDir);
-    }
-    // Hax, use the public function to see if the file exists XD
-    u8RetVal = u8BBWANT_Client_Appdir_ReadProtofile(sBuf2);
+      // Hax, use the public function to see if the file exists
+      u8RetVal = u8BBWANT_Client_Appdir_ReadProtofile(NULL);
+      
+      if (u8RetVal == BBWANT_ERROR)
+      {
+	// Did not exist, try to write it. Need to do this manually.
+	snprintf(sBuf2, BBWANT_FILE_PATH_SIZE - 1, "%s/%s",
+		 sBuf1, BBWANT_CLIENT_APPDIR_PROTOFILE);
+	printf("Creating file %s   ", sBuf2);
+	pProtofile = fopen(sBuf2, "w");
 
-    if (u8RetVal == BBWANT_OK)
-    {
-      *pu16Result |= BBWANT_CLIENT_APPDIR_PROTOFILE_OK;
+	if (pProtofile == NULL)
+	{
+	  printf("failed\n");
+	  u8RetVal = BBWANT_ERROR;
+	}
+	else
+	{
+	  // Might be ok. Try to write it.
+	  iTemp = fprintf(pProtofile, "%s\n", BBWANT_WHATSAPP_WEB_DEFAULT_VERSION);
+	  fclose(pProtofile);
+	  
+	  if (iTemp != strlen(BBWANT_WHATSAPP_WEB_DEFAULT_VERSION "\n"))
+	  {
+	    printf("failed\n");
+	    u8RetVal = BBWANT_ERROR;
+	  }
+	  else
+	  {
+	    printf("ok\n");
+
+	    // Add keyfile routines here
+	  }
+	}
+      }
     }
-    u8RetVal = BBWANT_OK;
   }
-  
+
   return u8RetVal;
 }
 
-//uint8_t u8BBWANT_Client_Appdir_CreateDir(void);
 
-//uint8_t u8BBWANT_Client_Appdir_WriteProtofile(char* sWriteProtoDesc);
 
 uint8_t u8BBWANT_Client_Appdir_ReadProtofile(char* sReadProtoDesc)
 {
@@ -97,7 +143,7 @@ uint8_t u8BBWANT_Client_Appdir_ReadProtofile(char* sReadProtoDesc)
 	     sBuf1, BBWANT_CLIENT_APPDIR_PROTOFILE);
 
     // And try to open it
-    pProtofile = fopen(sBuf2, "r+");
+    pProtofile = fopen(sBuf2, "r");
 
     if (pProtofile == NULL)
     {
@@ -128,8 +174,11 @@ uint8_t u8BBWANT_Client_Appdir_ReadProtofile(char* sReadProtoDesc)
 	// Ok, if we now have something in sBuf1, then we have it
 	if (strlen(sBuf1) > 0)
 	{
-	  // We have it! Copy out.
-	  strncpy(sReadProtoDesc, sBuf1, BBWANT_FILE_PATH_SIZE - 1);
+	  // We have it! Copy out if it is needed.
+	  if (sReadProtoDesc != NULL)
+	  {
+	    strncpy(sReadProtoDesc, sBuf1, BBWANT_FILE_PATH_SIZE - 1);
+	  }
 	}
 	else
 	{
@@ -138,6 +187,5 @@ uint8_t u8BBWANT_Client_Appdir_ReadProtofile(char* sReadProtoDesc)
       }
     }
   }
-    
   return u8RetVal;
 }

@@ -105,10 +105,10 @@ static uint8_t u8BBWANT_Client_MakeQrHelloTest(tBBWANT_Client_State* pxClientSta
   return u8RetVal;
 }
 
+
 uint8_t u8BBWANT_Client_Default_Actions(tBBWANT_Client_State* pxClientState)
 {
   uint8_t u8RetVal = BBWANT_OK;
-  uint16_t u16AppDirResult = 0;
   
   /*
   tBBWANT_ConnState* pxTempConnection;
@@ -143,25 +143,7 @@ uint8_t u8BBWANT_Client_Default_Actions(tBBWANT_Client_State* pxClientState)
   
   u8BBWANT_Websocket_FreeConnection(pxTempConnection);
   */
-  u8BBWANT_Client_Appdir_AnalyzeStructure(&u16AppDirResult);
-
-  if (u16AppDirResult & BBWANT_CLIENT_APPDIR_DIR_EXISTS)
-  {
-    printf("App dir exists\n");
-  }
-  else
-  {
-    printf("App dir does not exist\n");
-  }
-  if (u16AppDirResult & BBWANT_CLIENT_APPDIR_PROTOFILE_OK)
-  {
-    printf("Protofile is ok\n");
-  }
-  else
-  {
-    printf("Protofile is not ok\n");
-  }
-
+  u8BBWANT_Client_Appdir_CreateMissingResources();
   
   return u8RetVal;
 }
