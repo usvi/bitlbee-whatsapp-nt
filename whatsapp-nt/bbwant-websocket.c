@@ -445,7 +445,7 @@ uint8_t u8BBWANT_Websocket_BuildConnection(const char* sWsUrl, const char* sOrig
       }
       if (!strcmp(sParsedProto, "https") || !strcmp(sParsedProto, "wss"))
       {
-	pxConnState->pxWsClientConnectInfo->ssl_connection = 2;
+	pxConnState->pxWsClientConnectInfo->ssl_connection = 1;
       }
 
       pxConnState->pxWsClientConnectInfo->host = pxConnState->pxWsClientConnectInfo->address;
