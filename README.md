@@ -47,6 +47,10 @@ LTS.
 
 http://libpng.org/pub/png/libpng.html
 
+### AES library
+Some kind of AES library is needed probably. This looks good:
+https://github.com/kokke/tiny-AES-c
+
 ## Ideas / random thoughts
 Make test binary for writing big arbitrary QR code PNG files.
 
