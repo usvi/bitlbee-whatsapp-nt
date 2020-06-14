@@ -110,6 +110,17 @@ uint8_t u8BBWANT_Client_Default_Actions(tBBWANT_Client_State* pxClientState)
 {
   uint8_t u8RetVal = BBWANT_OK;
   
+  u8RetVal = u8BBWANT_Client_Appdir_CreateMissingResources();
+
+  if (u8RetVal == BBWANT_OK)
+  {
+    ;
+  }
+  else
+  {
+    // Put socket stuff here once we figure out the details
+    ;
+  }
   /*
   tBBWANT_ConnState* pxTempConnection;
   u8RetVal = u8BBWANT_Websocket_AllocateConnection(&pxTempConnection);
@@ -143,7 +154,6 @@ uint8_t u8BBWANT_Client_Default_Actions(tBBWANT_Client_State* pxClientState)
   
   u8BBWANT_Websocket_FreeConnection(pxTempConnection);
   */
-  u8BBWANT_Client_Appdir_CreateMissingResources();
   
   return u8RetVal;
 }
