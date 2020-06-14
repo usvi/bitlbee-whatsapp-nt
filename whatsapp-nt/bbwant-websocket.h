@@ -20,9 +20,9 @@ typedef struct
 } tBBWANT_ConnState;
 
 
-uint8_t u8BBWANT_WebsocketAllocateConnection(const char* sWsUrl, const char* sOriginUrl,
+uint8_t u8BBWANT_Websocket_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
 					   tBBWANT_ConnState** ppxConnState);
-uint8_t u8BBWANT_WebsocketFreeConnection(tBBWANT_ConnState* pxConnState);
-tBBWANT_ConnState* pxBBWANT_WebsocketGetSetContext(tBBWANT_ConnState** ppxConnState);  
+uint8_t u8BBWANT_Websocket_FreeConnection(tBBWANT_ConnState* pxConnState);
+tBBWANT_ConnState* pxBBWANT_Websocket_GetSetContext(tBBWANT_ConnState** ppxConnState);  
 
 #endif // #ifndef _BBWANT_WEBSOCKET_H_

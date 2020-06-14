@@ -13,7 +13,7 @@
 static uint8_t gu8Connecting;
 
 
-tBBWANT_ConnState* pxBBWANT_WebsocketGetSetContext(tBBWANT_ConnState** ppxConnState)
+tBBWANT_ConnState* pxBBWANT_Websocket_GetSetContext(tBBWANT_ConnState** ppxConnState)
 {
   static tBBWANT_ConnState* pxStoredConnState = NULL;
 
@@ -25,7 +25,7 @@ tBBWANT_ConnState* pxBBWANT_WebsocketGetSetContext(tBBWANT_ConnState** ppxConnSt
   return pxStoredConnState;
 }
 
-static void BBWANT_WebsocketPrintCbReason(enum lws_callback_reasons reason)
+static void BBWANT_Websocket_PrintCbReason(enum lws_callback_reasons reason)
 {
   switch (reason)
   {
@@ -156,7 +156,7 @@ static void BBWANT_WebsocketPrintCbReason(enum lws_callback_reasons reason)
 }
 
 
-static uint8_t u8BBWANT_WebsocketRemoveFromHeaderData(void *pHeaderData, char* sSearchKey, int16_t i16HowMuch)
+static uint8_t u8BBWANT_Websocket_RemoveFromHeaderData(void *pHeaderData, char* sSearchKey, int16_t i16HowMuch)
 {
   uint8_t u8RetVal = BBWANT_OK;
   uint16_t u16i = 0;
@@ -269,10 +269,10 @@ static uint8_t u8BBWANT_WebsocketRemoveFromHeaderData(void *pHeaderData, char* s
 }
 
 
-static int iBBWANT_WebsocketCallback(struct lws *wsi, enum lws_callback_reasons reason,
-				   void *user, void *in, size_t len)
+static int iBBWANT_Websocket_Callback(struct lws *wsi, enum lws_callback_reasons reason,
+				      void *user, void *in, size_t len)
 {
-  BBWANT_WebsocketPrintCbReason(reason);
+  BBWANT_Websocket_PrintCbReason(reason);
   
   switch (reason)
   {
@@ -284,8 +284,8 @@ static int iBBWANT_WebsocketCallback(struct lws *wsi, enum lws_callback_reasons 
     break;
   case LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER:
     // Clean headers.
-    u8BBWANT_WebsocketRemoveFromHeaderData(in, "http://https://", strlen("http://"));
-    u8BBWANT_WebsocketRemoveFromHeaderData(in, "Sec-WebSocket-Protocol", BBWANT_WEBSOCKET_REMOVE_SINGLE_HEADER);
+    u8BBWANT_Websocket_RemoveFromHeaderData(in, "http://https://", strlen("http://"));
+    u8BBWANT_Websocket_RemoveFromHeaderData(in, "Sec-WebSocket-Protocol", BBWANT_WEBSOCKET_REMOVE_SINGLE_HEADER);
     break;
   default:
     break;
@@ -295,11 +295,11 @@ static int iBBWANT_WebsocketCallback(struct lws *wsi, enum lws_callback_reasons 
 }
   
 
-static struct lws_protocols axBBWANT_WebsocketProtocols[] =
+static struct lws_protocols axBBWANT_Websocket_Protocols[] =
 {
   {
     "whatsapp-nt-minimal-client",
-    iBBWANT_WebsocketCallback,
+    iBBWANT_Websocket_Callback,
     0,
     4000,
   },
@@ -307,7 +307,7 @@ static struct lws_protocols axBBWANT_WebsocketProtocols[] =
 };
 
 
-static const struct lws_extension axBBWANT_WebsocketExts[] =
+static const struct lws_extension axBBWANT_Websocket_Exts[] =
 {
   {
     "permessage-deflate",
@@ -323,7 +323,7 @@ static const struct lws_extension axBBWANT_WebsocketExts[] =
 };
 
 
-uint8_t u8BBWANT_WebsocketAllocateConnection(const char* sWsUrl, const char* sOriginUrl,
+uint8_t u8BBWANT_Websocket_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
 					   tBBWANT_ConnState** ppxConnState)
 {
   // Everything needs to be malloced and zeroed.
@@ -350,7 +350,7 @@ uint8_t u8BBWANT_WebsocketAllocateConnection(const char* sWsUrl, const char* sOr
     // Creation successful, so assign pointer for exporting and storing the stuff
         // Fixme: Later make this more sane, so that caller stores it.
     *ppxConnState = pxNewConnState;
-    pxBBWANT_WebsocketGetSetContext(ppxConnState);
+    pxBBWANT_Websocket_GetSetContext(ppxConnState);
 
     pxNewConnState->sWebsocketUrlPartStore = NULL;
     pxNewConnState->sWebsocketUrlPartStore = malloc(BBWANT_URL_PATH_SIZE);
@@ -451,7 +451,7 @@ uint8_t u8BBWANT_WebsocketAllocateConnection(const char* sWsUrl, const char* sOr
     pxNewConnState->pxWsClientConnectInfo->path = pxNewConnState->sWebsocketRealPathStore;
 
     pxNewConnState->pxWsContextCreationInfo->port = CONTEXT_PORT_NO_LISTEN;
-    pxNewConnState->pxWsContextCreationInfo->protocols = axBBWANT_WebsocketProtocols;
+    pxNewConnState->pxWsContextCreationInfo->protocols = axBBWANT_Websocket_Protocols;
     pxNewConnState->pxWsContextCreationInfo->gid = -1;
     pxNewConnState->pxWsContextCreationInfo->uid = -1;
     
@@ -485,10 +485,10 @@ uint8_t u8BBWANT_WebsocketAllocateConnection(const char* sWsUrl, const char* sOr
       pxNewConnState->pxWsClientConnectInfo->host = pxNewConnState->pxWsClientConnectInfo->address;
       pxNewConnState->pxWsClientConnectInfo->origin = pxNewConnState->sWebsocketOriginUrlStore;
       pxNewConnState->pxWsClientConnectInfo->ietf_version_or_minus_one = -1;
-      pxNewConnState->pxWsClientConnectInfo->client_exts = axBBWANT_WebsocketExts;
+      pxNewConnState->pxWsClientConnectInfo->client_exts = axBBWANT_Websocket_Exts;
     }
   }
-  pxNewConnState->pxWsClientConnectInfo->protocol = axBBWANT_WebsocketProtocols[0].name;
+  pxNewConnState->pxWsClientConnectInfo->protocol = axBBWANT_Websocket_Protocols[0].name;
   gu8Connecting = 1;
   pxConnectResult = lws_client_connect_via_info(pxNewConnState->pxWsClientConnectInfo);
 
@@ -504,7 +504,7 @@ uint8_t u8BBWANT_WebsocketAllocateConnection(const char* sWsUrl, const char* sOr
   return u8RetVal;
 }
 
-uint8_t u8BBWANT_WebsocketFreeConnection(tBBWANT_ConnState* pxConnState)
+uint8_t u8BBWANT_Websocket_FreeConnection(tBBWANT_ConnState* pxConnState)
 {
   uint8_t u8RetVal = BBWANT_OK;
   
