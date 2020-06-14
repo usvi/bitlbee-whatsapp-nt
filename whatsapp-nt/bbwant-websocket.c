@@ -10,9 +10,6 @@
 #define BBWANT_WEBSOCKET_REMOVE_SINGLE_HEADER (-1)
 
 
-static uint8_t gu8Connecting;
-
-
 tBBWANT_ConnState* pxBBWANT_Websocket_GetSetContext(tBBWANT_ConnState** ppxConnState)
 {
   static tBBWANT_ConnState* pxStoredConnState = NULL;
@@ -152,7 +149,6 @@ static void BBWANT_Websocket_PrintCbReason(enum lws_callback_reasons reason)
   default:
     lwsl_notice("SOMETHING ELSE HAPPENED\n");
   }
-
 }
 
 
@@ -272,15 +268,19 @@ static uint8_t u8BBWANT_Websocket_RemoveFromHeaderData(void *pHeaderData, char* 
 static int iBBWANT_Websocket_Callback(struct lws *wsi, enum lws_callback_reasons reason,
 				      void *user, void *in, size_t len)
 {
+  tBBWANT_ConnState* pxConnState = NULL;
+  
   BBWANT_Websocket_PrintCbReason(reason);
   
   switch (reason)
   {
   case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
-    gu8Connecting = 0;
+    pxConnState = pxBBWANT_Websocket_GetSetContext(NULL);
+    pxConnState->u8Connecting = 0;
     break;
   case LWS_CALLBACK_CLIENT_ESTABLISHED:
-    gu8Connecting = 0;
+    pxConnState = pxBBWANT_Websocket_GetSetContext(NULL);
+    pxConnState->u8Connecting = 0;
     break;
   case LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER:
     // Clean headers.
@@ -324,18 +324,12 @@ static const struct lws_extension axBBWANT_Websocket_Exts[] =
 };
 
 
-uint8_t u8BBWANT_Websocket_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
-					   tBBWANT_ConnState** ppxConnState)
+uint8_t u8BBWANT_Websocket_AllocateConnection(tBBWANT_ConnState** ppxConnState)
 {
   // Everything needs to be malloced and zeroed.
   uint8_t u8RetVal = BBWANT_OK;
-  const char* sParsedProto;
-  const char* sParsedPath;
-  int iTemp = 0;
   tBBWANT_ConnState* pxNewConnState = NULL;
-  struct lws* pxConnectResult;
 
-  gu8Connecting = 0;
   //lws_set_log_level(2047, NULL);
   
   
@@ -348,159 +342,160 @@ uint8_t u8BBWANT_Websocket_AllocateConnection(const char* sWsUrl, const char* sO
   }
   else
   {
-    // Creation successful, so assign pointer for exporting and storing the stuff
-        // Fixme: Later make this more sane, so that caller stores it.
+    // Successfully created
     *ppxConnState = pxNewConnState;
-    pxBBWANT_Websocket_GetSetContext(ppxConnState);
-
+    // Everything sele can be set sequantially now
+    
     pxNewConnState->sWebsocketUrlPartStore = NULL;
     pxNewConnState->sWebsocketUrlPartStore = malloc(BBWANT_URL_PATH_SIZE);
+    pxNewConnState->sWebsocketOriginUrlStore = NULL;
+    pxNewConnState->sWebsocketOriginUrlStore = malloc(BBWANT_URL_PATH_SIZE);
+    pxNewConnState->sWebsocketRealPathStore = NULL;
+    pxNewConnState->sWebsocketRealPathStore = malloc(BBWANT_URL_PATH_SIZE);
+    pxNewConnState->pxWsClientConnectInfo = NULL;
+    pxNewConnState->pxWsClientConnectInfo = malloc(sizeof(struct lws_client_connect_info));
+    pxNewConnState->pxWsContextCreationInfo = NULL;
+    pxNewConnState->pxWsContextCreationInfo = malloc(sizeof(struct lws_context_creation_info));
 
-    if (pxNewConnState->sWebsocketUrlPartStore == NULL)
+    // Check if successful
+    if ((pxNewConnState->sWebsocketUrlPartStore == NULL) ||
+	(pxNewConnState->sWebsocketOriginUrlStore == NULL) ||
+	(pxNewConnState->sWebsocketRealPathStore == NULL) ||
+	(pxNewConnState->pxWsClientConnectInfo == NULL) ||
+	(pxNewConnState->pxWsContextCreationInfo == NULL))
     {
-      free(pxNewConnState);
+      free(pxNewConnState->sWebsocketUrlPartStore);
+      free(pxNewConnState->sWebsocketOriginUrlStore);
+      free(pxNewConnState->sWebsocketRealPathStore);
+      free(pxNewConnState->pxWsClientConnectInfo);
+      free(pxNewConnState->pxWsContextCreationInfo);
+      
       u8RetVal = BBWANT_ERROR;
     }
     else
     {
-      pxNewConnState->sWebsocketOriginUrlStore = NULL;
-      pxNewConnState->sWebsocketOriginUrlStore = malloc(BBWANT_URL_PATH_SIZE);
-
-      if (pxNewConnState->sWebsocketOriginUrlStore == NULL)
-      {
-	free(pxNewConnState->sWebsocketUrlPartStore);
-	free(pxNewConnState);
-	u8RetVal = BBWANT_ERROR;
-      }
-      else
-      {
-	pxNewConnState->sWebsocketRealPathStore = NULL;
-	pxNewConnState->sWebsocketRealPathStore = malloc(BBWANT_URL_PATH_SIZE);
-
-	if (pxNewConnState->sWebsocketRealPathStore == NULL)
-	{
-	  free(pxNewConnState->sWebsocketOriginUrlStore);
-	  free(pxNewConnState->sWebsocketUrlPartStore);
-	  free(pxNewConnState);
-	  u8RetVal = BBWANT_ERROR;
-	}
-	else
-	{
-	  pxNewConnState->pxWsClientConnectInfo = NULL;
-	  pxNewConnState->pxWsClientConnectInfo = malloc(sizeof(struct lws_client_connect_info));
-	
-	  if (pxNewConnState->pxWsClientConnectInfo == NULL)
-	  {
-	    free(pxNewConnState->sWebsocketRealPathStore);
-	    free(pxNewConnState->sWebsocketOriginUrlStore);
-	    free(pxNewConnState->sWebsocketUrlPartStore);
-	    free(pxNewConnState);
-	    u8RetVal = BBWANT_ERROR;
-	  }
-	  else
-	  {
-	    pxNewConnState->pxWsContextCreationInfo = NULL;
-	    pxNewConnState->pxWsContextCreationInfo = malloc(sizeof(struct lws_context_creation_info));
-	  
-	    if (pxNewConnState->pxWsContextCreationInfo == NULL)
-	    {
-	      free(pxNewConnState->pxWsClientConnectInfo);
-	      free(pxNewConnState->sWebsocketRealPathStore);
-	      free(pxNewConnState->sWebsocketOriginUrlStore);
-	      free(pxNewConnState->sWebsocketUrlPartStore);
-	      free(pxNewConnState);
-	      u8RetVal = BBWANT_ERROR;
-	    }
-	  }
-	}
-      }
+      // All malloc'd, good. Zero everything in one go.
+      memset(pxNewConnState->sWebsocketUrlPartStore, 0, BBWANT_URL_PATH_SIZE);
+      memset(pxNewConnState->sWebsocketOriginUrlStore, 0, BBWANT_URL_PATH_SIZE);
+      memset(pxNewConnState->sWebsocketRealPathStore, 0, BBWANT_URL_PATH_SIZE);
+      memset(pxNewConnState->pxWsClientConnectInfo, 0, sizeof(*(pxNewConnState->pxWsClientConnectInfo)));
+      memset(pxNewConnState->pxWsContextCreationInfo, 0, sizeof(*(pxNewConnState->pxWsContextCreationInfo)));
+      pxNewConnState->pxWsContext = NULL;
+      pxNewConnState->pxConnection = NULL;
+      pxNewConnState->u8Connecting = 0;
     }
   }
-  // All malloc'd, good. Zero everything in one go.
-  memset(pxNewConnState->sWebsocketUrlPartStore, 0, BBWANT_URL_PATH_SIZE);
-  memset(pxNewConnState->sWebsocketOriginUrlStore, 0, BBWANT_URL_PATH_SIZE);
-  memset(pxNewConnState->sWebsocketRealPathStore, 0, BBWANT_URL_PATH_SIZE);
-  memset(pxNewConnState->pxWsClientConnectInfo, 0, sizeof(*(pxNewConnState->pxWsClientConnectInfo)));
-  memset(pxNewConnState->pxWsContextCreationInfo, 0, sizeof(*(pxNewConnState->pxWsContextCreationInfo)));
-  pxNewConnState->pxWsContext = NULL;
+
+  return u8RetVal;
+}
+    
+uint8_t u8BBWANT_Websocket_BuildConnection(const char* sWsUrl, const char* sOriginUrl,
+					   tBBWANT_ConnState** ppxConnState)
+{
+  uint8_t u8RetVal = BBWANT_OK;
+  tBBWANT_ConnState* pxConnState = NULL;
+  int iTemp = 0;
+  const char* sParsedProto;
+  const char* sParsedPath;
+  
+  pxConnState = *ppxConnState;
 
   // And now, do somewhat what we saw in the original websockets library
   // test-client.c
-  strncpy(pxNewConnState->sWebsocketUrlPartStore, sWsUrl, BBWANT_URL_PATH_SIZE - 1);
-  strncpy(pxNewConnState->sWebsocketOriginUrlStore, sOriginUrl, BBWANT_URL_PATH_SIZE - 1);
+  strncpy(pxConnState->sWebsocketUrlPartStore, sWsUrl, BBWANT_URL_PATH_SIZE - 1);
+  strncpy(pxConnState->sWebsocketOriginUrlStore, sOriginUrl, BBWANT_URL_PATH_SIZE - 1);
 
-  pxNewConnState->pxWsClientConnectInfo->port = BBWANT_DEFAULT_WS_PORT;
-  iTemp = lws_parse_uri(pxNewConnState->sWebsocketUrlPartStore, &sParsedProto,
-			&(pxNewConnState->pxWsClientConnectInfo->address),
-			&(pxNewConnState->pxWsClientConnectInfo->port),
+  pxConnState->pxWsClientConnectInfo->port = BBWANT_DEFAULT_WS_PORT;
+  iTemp = lws_parse_uri(pxConnState->sWebsocketUrlPartStore, &sParsedProto,
+			&(pxConnState->pxWsClientConnectInfo->address),
+			&(pxConnState->pxWsClientConnectInfo->port),
 			&sParsedPath);
-
+  
   if (iTemp != 0)
   {
-    free(pxNewConnState->pxWsClientConnectInfo);
-    free(pxNewConnState->sWebsocketRealPathStore);
-    free(pxNewConnState->sWebsocketOriginUrlStore);
-    free(pxNewConnState->sWebsocketUrlPartStore);
-    free(pxNewConnState);
     u8RetVal = BBWANT_ERROR;
   }
   else
   {
     // Add back leading /
-    pxNewConnState->sWebsocketRealPathStore[0] = '/';
-    strncpy(pxNewConnState->sWebsocketRealPathStore + 1, sParsedPath, BBWANT_URL_PATH_SIZE - 2);
-    pxNewConnState->pxWsClientConnectInfo->path = pxNewConnState->sWebsocketRealPathStore;
+    pxConnState->sWebsocketRealPathStore[0] = '/';
+    strncpy(pxConnState->sWebsocketRealPathStore + 1, sParsedPath, BBWANT_URL_PATH_SIZE - 2);
+    pxConnState->pxWsClientConnectInfo->path = pxConnState->sWebsocketRealPathStore;
 
-    pxNewConnState->pxWsContextCreationInfo->port = CONTEXT_PORT_NO_LISTEN;
-    pxNewConnState->pxWsContextCreationInfo->protocols = axBBWANT_Websocket_Protocols;
-    pxNewConnState->pxWsContextCreationInfo->gid = -1;
-    pxNewConnState->pxWsContextCreationInfo->uid = -1;
-    
-    pxNewConnState->pxWsContext = lws_create_context(pxNewConnState->pxWsContextCreationInfo);
+    pxConnState->pxWsContextCreationInfo->port = CONTEXT_PORT_NO_LISTEN;
+    pxConnState->pxWsContextCreationInfo->protocols = axBBWANT_Websocket_Protocols;
+    pxConnState->pxWsContextCreationInfo->gid = -1;
+    pxConnState->pxWsContextCreationInfo->uid = -1;
 
-    if (pxNewConnState->pxWsContext == NULL)
+    // Try to create context
+    pxConnState->pxWsContext = lws_create_context(pxConnState->pxWsContextCreationInfo);
+
+    if (pxConnState->pxWsContext == NULL)
     {
-      free(pxNewConnState->pxWsClientConnectInfo);
-      free(pxNewConnState->sWebsocketRealPathStore);
-      free(pxNewConnState->sWebsocketOriginUrlStore);
-      free(pxNewConnState->sWebsocketUrlPartStore);
-      free(pxNewConnState);
       u8RetVal = BBWANT_ERROR;
     }
     else
     {
-      pxNewConnState->pxWsClientConnectInfo->context = pxNewConnState->pxWsContext;
-
+      pxConnState->pxWsClientConnectInfo->context = pxConnState->pxWsContext;
 
       if (!strcmp(sParsedProto, "http") || !strcmp(sParsedProto, "ws"))
       {
-	pxNewConnState->pxWsClientConnectInfo->ssl_connection = 0;
+	pxConnState->pxWsClientConnectInfo->ssl_connection = 0;
 
       }
       if (!strcmp(sParsedProto, "https") || !strcmp(sParsedProto, "wss"))
       {
-	pxNewConnState->pxWsClientConnectInfo->ssl_connection = 2;
+	pxConnState->pxWsClientConnectInfo->ssl_connection = 2;
       }
-      
 
-      pxNewConnState->pxWsClientConnectInfo->host = pxNewConnState->pxWsClientConnectInfo->address;
-      pxNewConnState->pxWsClientConnectInfo->origin = pxNewConnState->sWebsocketOriginUrlStore;
-      pxNewConnState->pxWsClientConnectInfo->ietf_version_or_minus_one = -1;
-      pxNewConnState->pxWsClientConnectInfo->client_exts = axBBWANT_Websocket_Exts;
+      pxConnState->pxWsClientConnectInfo->host = pxConnState->pxWsClientConnectInfo->address;
+      pxConnState->pxWsClientConnectInfo->origin = pxConnState->sWebsocketOriginUrlStore;
+      pxConnState->pxWsClientConnectInfo->ietf_version_or_minus_one = -1;
+      pxConnState->pxWsClientConnectInfo->client_exts = axBBWANT_Websocket_Exts;
+
+      pxConnState->pxWsClientConnectInfo->protocol = axBBWANT_Websocket_Protocols[0].name;
     }
   }
-  pxNewConnState->pxWsClientConnectInfo->protocol = axBBWANT_Websocket_Protocols[0].name;
-  gu8Connecting = 1;
-  pxConnectResult = lws_client_connect_via_info(pxNewConnState->pxWsClientConnectInfo);
+  
+  return u8RetVal;
+}
 
-  if (pxConnectResult != NULL)
+uint8_t u8BBWANT_Websocket_Connect(tBBWANT_ConnState** ppxConnState)
+{
+  uint8_t u8RetVal = BBWANT_OK;
+  tBBWANT_ConnState* pxConnState = NULL;
+  
+  pxConnState = *ppxConnState;
+
+  pxConnState->u8Connecting = 1;
+  pxConnState->pxConnection = lws_client_connect_via_info(pxConnState->pxWsClientConnectInfo);
+
+  if (pxConnState->pxConnection == NULL)
   {
-    while(gu8Connecting)
+    pxConnState->u8Connecting = 0;
+    u8RetVal = BBWANT_ERROR;
+  }
+  else
+  {
+    while(pxConnState->u8Connecting)
     {
-      lws_service(pxNewConnState->pxWsClientConnectInfo->context, 25);
+      lws_service(pxConnState->pxWsClientConnectInfo->context, 25);
     }
   }
+  pxConnState->u8Connecting = 0;
+  
+  return u8RetVal;
+}
 
+uint8_t u8BBWANT_Websocket_Disconnect(tBBWANT_ConnState** ppxConnState)
+{
+  uint8_t u8RetVal = BBWANT_OK;
+  tBBWANT_ConnState* pxConnState = NULL;
+  
+  pxConnState = *ppxConnState;
+
+  lws_close_reason(pxConnState->pxConnection, LWS_CLOSE_STATUS_NORMAL,
+		   (unsigned char*)"Bye!", strlen("Bye!"));
 
   return u8RetVal;
 }
@@ -508,8 +503,12 @@ uint8_t u8BBWANT_Websocket_AllocateConnection(const char* sWsUrl, const char* sO
 uint8_t u8BBWANT_Websocket_FreeConnection(tBBWANT_ConnState* pxConnState)
 {
   uint8_t u8RetVal = BBWANT_OK;
-  
-  lws_context_destroy(pxConnState->pxWsContext);
+
+  // Do something to pxConnection, but how?
+  if (pxConnState->pxWsContext != NULL)
+  {
+    lws_context_destroy(pxConnState->pxWsContext);
+  }
   free(pxConnState->pxWsContextCreationInfo);
   free(pxConnState->pxWsClientConnectInfo);
   free(pxConnState->sWebsocketRealPathStore);

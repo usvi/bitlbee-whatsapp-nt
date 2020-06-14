@@ -109,7 +109,35 @@ uint8_t u8BBWANT_Client_Default_Actions(tBBWANT_Client_State* pxClientState)
   uint8_t u8RetVal = BBWANT_OK;
   tBBWANT_ConnState* pxTempConnection;
 
-  u8RetVal = u8BBWANT_Websocket_AllocateConnection("wss://web.whatsapp.com/ws", "https://web.whatsapp.com", &pxTempConnection);
+  u8RetVal = u8BBWANT_Websocket_AllocateConnection(&pxTempConnection);
+
+  if (u8RetVal != BBWANT_OK)
+  {
+
+  }
+  else
+  {
+    pxBBWANT_Websocket_GetSetContext(&pxTempConnection);
+    //u8RetVal = u8BBWANT_Websocket_BuildConnection("wss://web.whatsapp.com/ws", "https://web.whatsapp.com", &pxTempConnection);
+    u8RetVal = u8BBWANT_Websocket_BuildConnection("ws://echo.websocket.org/?encoding=text", "https://www.websocket.org", &pxTempConnection);
+
+    if (u8RetVal != BBWANT_OK)
+    {
+
+    }
+    else
+    {
+      u8RetVal = u8BBWANT_Websocket_Connect(&pxTempConnection);
+
+      if (u8RetVal == BBWANT_OK)
+      {
+	// Manage loop
+	// Disconnect
+	u8RetVal = u8BBWANT_Websocket_Disconnect(&pxTempConnection);
+      }
+    }
+  }
+  
   u8BBWANT_Websocket_FreeConnection(pxTempConnection);
 
   return u8RetVal;
