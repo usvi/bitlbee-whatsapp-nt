@@ -81,3 +81,13 @@ https://github.com/iamscottmoyers/simple-libwebsockets-example/blob/master/clien
 
 Ok nice, it seems https://www.websocket.org/echo.html works with current implemation.
 And the current Whatsapp connection does not.
+
+Why have separate setting for Whatsapp Web version? See:
+https://github.com/sigalor/whatsapp-web-reveng/issues/272
+It says:
+"JS demo is not working
+I tried to run the latest index_jsdemo.js in local and share the web session.
+I am able to start the local server , the QR code that got generated is not valid to
+start the web session sharing. Any idea??
+You need to update Whatsapp Web version to "0,4,2081"."
+
