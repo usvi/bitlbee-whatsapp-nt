@@ -6,6 +6,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+
+#define BBWANT_WEBSOCK_REMOVE_HEADER_DATE_LINE (-1)
+
+
 static uint8_t gu8Connecting;
 
 
@@ -152,10 +156,123 @@ static void BBWANT_WebsockPrintCbReason(enum lws_callback_reasons reason)
 }
 
 
+static uint8_t u8BBWANT_WebsockRemoveFromHeaderData(void *pHeaderData, char* sSearchKey, int16_t i16HowMuch)
+{
+  uint8_t u8RetVal = BBWANT_OK;
+  uint16_t u16i = 0;
+  char** psHeaderData = NULL;
+  char* sHeaderStart = NULL;
+  char* sKeyFoundPos = NULL;
+  char* sEraseStart = NULL;
+  char* sEraseEnd = NULL;
+  psHeaderData = (char **)pHeaderData;
+
+
+  if ((i16HowMuch == 0) || (i16HowMuch < BBWANT_WEBSOCK_REMOVE_HEADER_DATE_LINE))
+  {
+    u8RetVal = BBWANT_ERROR;
+
+    return u8RetVal;
+  }
+  // Get header begin first
+  for (u16i = 1; u16i < 4000; u16i++)
+  {
+    if ((*((*psHeaderData) - u16i)) == '/')
+    {
+      if (strncmp(((*psHeaderData) - u16i - strlen("GET ")),
+		  "GET /", strlen("GET /")) == 0)
+      {
+	sHeaderStart = (*psHeaderData) - u16i - strlen("GET ");
+	u16i = 5000; // Bail
+      }
+    }
+  }
+  if (sHeaderStart == NULL)
+  {
+    u8RetVal = BBWANT_ERROR;
+  }
+  else
+  {
+    if (i16HowMuch == BBWANT_WEBSOCK_REMOVE_HEADER_DATE_LINE)
+    {
+      // Erase whole part
+      sKeyFoundPos = strstr(sHeaderStart, sSearchKey);
+
+      if (sKeyFoundPos == NULL)
+      {
+	u8RetVal = BBWANT_ERROR;
+      }
+      else
+      {
+	// Now we need to erase whole header line. How?
+	// We search where is last \n, that +1 will be
+	// the starting point.
+	// Ending point is position of next \n + 1
+
+	// Backward search is manual unfortunately..
+	sEraseStart = sKeyFoundPos;
+
+	for (u16i = 0; u16i < 1000; u16i++)
+	{
+	  if (*(sEraseStart - u16i) == '\n')
+	  {
+	    // Found it
+	    sEraseStart = sEraseStart - u16i + 1;
+	    u16i = 2000; // Bail
+	  }
+	}
+	sEraseEnd = strstr(sKeyFoundPos, "\n");
+
+	if (sEraseEnd != NULL)
+	{
+	  sEraseEnd++;
+	}
+	// Go forward only if we got both
+	if (((*(sEraseStart - 1)) != '\n') || sEraseEnd == NULL)
+	{
+	  u8RetVal = BBWANT_ERROR;
+	}
+	else
+	{
+	  // Move the rest to left.
+	  memmove(sEraseStart, sEraseEnd, strlen(sEraseEnd));
+	  // Terminate from end
+	  *(sEraseEnd + strlen(sEraseEnd) - (sEraseEnd - sEraseStart)) = 0;
+	  // Tell caller where we are actually.
+	  *psHeaderData -= (sEraseEnd - sEraseStart);
+	}
+
+      }
+    }
+    else // if (i16HowMuch == BBWANT_WEBSOCK_REMOVE_HEADER_DATE_LINE)
+    {
+      // Erase only on the spot
+      sKeyFoundPos = strstr(sHeaderStart, sSearchKey);
+
+      if (sKeyFoundPos == NULL)
+      {
+	u8RetVal = BBWANT_ERROR;
+      }
+      else
+      {
+	// Move left amount given
+	memmove(sKeyFoundPos, sKeyFoundPos + i16HowMuch, strlen(sKeyFoundPos) - i16HowMuch);
+	// Terminate from end
+	*(sKeyFoundPos + strlen(sKeyFoundPos) - i16HowMuch) = 0;
+	// Tell caller where we are
+	*psHeaderData -= i16HowMuch;
+      }
+    }
+  }
+
+  return u8RetVal;
+}
+
+
 static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons reason,
 				   void *user, void *in, size_t len)
 {
-  //BBWANT_WebsockPrintCbReason(reason);
+  BBWANT_WebsockPrintCbReason(reason);
   
   switch (reason)
   {
@@ -166,6 +283,9 @@ static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons re
     gu8Connecting = 0;
     break;
   case LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER:
+    // Clean headers.
+    u8BBWANT_WebsockRemoveFromHeaderData(in, "http://https://", strlen("http://"));
+    u8BBWANT_WebsockRemoveFromHeaderData(in, "Sec-WebSocket-Protocol", BBWANT_WEBSOCK_REMOVE_HEADER_DATE_LINE);
     break;
   default:
     break;
@@ -201,6 +321,7 @@ static const struct lws_extension axBBWANT_WebsockExts[] =
   },
   { NULL, NULL, NULL }
 };
+
 
 uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
 					   tBBWANT_ConnState** ppxConnState)
@@ -371,9 +492,6 @@ uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
 
       pxNewConnState->pxWsClientConnectInfo->host = pxNewConnState->pxWsClientConnectInfo->address;
       pxNewConnState->pxWsClientConnectInfo->origin = pxNewConnState->sWebsockOriginUrlStore;
-
-      lwsl_notice("Host: >%s<   Origin: >%s<    Path: >%s<\n", pxNewConnState->pxWsClientConnectInfo->host,
-		  pxNewConnState->pxWsClientConnectInfo->origin, pxNewConnState->pxWsClientConnectInfo->path);
       pxNewConnState->pxWsClientConnectInfo->ietf_version_or_minus_one = -1;
       pxNewConnState->pxWsClientConnectInfo->client_exts = axBBWANT_WebsockExts;
     }

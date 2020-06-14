@@ -109,22 +109,10 @@ uint8_t u8BBWANT_Client_Default_Actions(tBBWANT_Client_State* pxClientState)
   uint8_t u8RetVal = BBWANT_OK;
   tBBWANT_ConnState* pxTempConnection;
 
-  // Whatsapp SSL, this should work, but it does not:
-  //u8RetVal = u8BBWANT_AllocateConnection("wss://web.whatsapp.com/ws", "https://web.whatsapp.com", &pxTempConnection);
-  // Public echo server SSL:
-  //u8RetVal = u8BBWANT_AllocateConnection("wss://echo.websocket.org/?encoding=text", "https://www.websocket.org", &pxTempConnection);
-  // Public echo server plain:
-  //u8RetVal = u8BBWANT_AllocateConnection("ws://echo.websocket.org/?encoding=text", "www.websocket.org", &pxTempConnection);
-
-  // Just a test:
-  u8RetVal = u8BBWANT_AllocateConnection("ws://echo.websocket.org/?encoding=text", "https://www.websocket.org", &pxTempConnection);
-
-  printf("Retval was %u\n", u8RetVal);
-  
+  u8RetVal = u8BBWANT_AllocateConnection("wss://web.whatsapp.com/ws", "https://web.whatsapp.com", &pxTempConnection);
   u8BBWANT_FreeConnection(pxTempConnection);
-  
 
-  return 0;
+  return u8RetVal;
 }
 
 int main(int argc, char* argv[])
