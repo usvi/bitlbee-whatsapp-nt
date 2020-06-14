@@ -1,4 +1,4 @@
-#include "bbwant-userdir.h"
+#include "bbwant-client-appdir.h"
 #include "bbwant.h"
 
 #include <stdint.h>
@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 
-static uint8_t u8BBWANT_Userdir_GetAppUserdir(char* sAppUserdir)
+static uint8_t u8BBWANT_Client_Appdir_GetPath(char* sAppUserdir)
 {
   uint8_t u8RetVal = BBWANT_OK;
   uid_t xUid;
@@ -32,13 +32,13 @@ static uint8_t u8BBWANT_Userdir_GetAppUserdir(char* sAppUserdir)
   return u8RetVal;
 }
 
-uint8_t u8BBWANT_Userdir_AnalyzeStructure(uint16_t* pu16Result)
+uint8_t u8BBWANT_Client_Appdir_AnalyzeStructure(uint16_t* pu16Result)
 {
   uint8_t u8RetVal = BBWANT_OK;
   char sBuf1[BBWANT_FILE_PATH_SIZE] = { 0 };
-  char sBuf2[BBWANT_FILE_PATH_SIZE] = { 0 };
+  //char sBuf2[BBWANT_FILE_PATH_SIZE] = { 0 };
 
-  u8RetVal = u8BBWANT_Userdir_GetAppUserdir(sBuf1);
+  u8RetVal = u8BBWANT_Client_Appdir_GetPath(sBuf1);
 
   if (u8RetVal == BBWANT_ERROR)
   {
@@ -51,6 +51,9 @@ uint8_t u8BBWANT_Userdir_AnalyzeStructure(uint16_t* pu16Result)
   
   return u8RetVal;
 }
-//uint8_t u8BBWANT_Userdir_CreateDir(void);
-//uint8_t u8BBWANT_Userdir_WriteProtofile(char* sWriteProtoDesc);
-//uint8_t u8BBWANT_Userdir_ReadProtofile(char* sReadProtoDesc);
+
+uint8_t u8BBWANT_Client_Appdir_AnalyzeStructure(uint16_t* pu16Result);
+//uint8_t u8BBWANT_Client_Appdir_CreateDir(void);
+//uint8_t u8BBWANT_Client_Appdir_WriteProtofile(char* sWriteProtoDesc);
+//uint8_t u8BBWANT_Client_Appdir_ReadProtofile(char* sReadProtoDesc);
+

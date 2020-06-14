@@ -21,7 +21,7 @@ bbwhatsapp_nt_client_SOURCES = \
 	bbwant-websocket.h \
 	bbwant-client.c \
 	bbwant-client.h \
-	bbwant-userdir.c \
-	bbwant-userdir.h \
+	bbwant-client-appdir.c \
+	bbwant-client-appdir.h \
 	bbwant-client-qrencode.c \
 	bbwant-client-qrencode.h

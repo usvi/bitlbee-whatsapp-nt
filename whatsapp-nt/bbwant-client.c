@@ -2,6 +2,7 @@
 #include "bbwant.h"
 #include "bbwant-client-qrencode.h"
 #include "bbwant-websocket.h"
+#include "bbwant-client-appdir.h"
 
 #include <stdio.h>
 #include <stdint.h>
@@ -142,8 +143,7 @@ uint8_t u8BBWANT_Client_Default_Actions(tBBWANT_Client_State* pxClientState)
   
   u8BBWANT_Websocket_FreeConnection(pxTempConnection);
   */
-
-  u8BBWANT_Userdir_AnalyzeStructure(&u16AppDirResult);
+  u8BBWANT_Client_Appdir_AnalyzeStructure(&u16AppDirResult);
   
   return u8RetVal;
 }
