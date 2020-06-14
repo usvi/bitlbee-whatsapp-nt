@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 
-#define BBWANT_WEBSOCK_REMOVE_HEADER_DATE_LINE (-1)
+#define BBWANT_WEBSOCK_REMOVE_SINGLE_HEADER (-1)
 
 
 static uint8_t gu8Connecting;
@@ -168,7 +168,7 @@ static uint8_t u8BBWANT_WebsockRemoveFromHeaderData(void *pHeaderData, char* sSe
   psHeaderData = (char **)pHeaderData;
 
 
-  if ((i16HowMuch == 0) || (i16HowMuch < BBWANT_WEBSOCK_REMOVE_HEADER_DATE_LINE))
+  if ((i16HowMuch == 0) || (i16HowMuch < BBWANT_WEBSOCK_REMOVE_SINGLE_HEADER))
   {
     u8RetVal = BBWANT_ERROR;
 
@@ -193,7 +193,7 @@ static uint8_t u8BBWANT_WebsockRemoveFromHeaderData(void *pHeaderData, char* sSe
   }
   else
   {
-    if (i16HowMuch == BBWANT_WEBSOCK_REMOVE_HEADER_DATE_LINE)
+    if (i16HowMuch == BBWANT_WEBSOCK_REMOVE_SINGLE_HEADER)
     {
       // Erase whole part
       sKeyFoundPos = strstr(sHeaderStart, sSearchKey);
@@ -285,7 +285,7 @@ static int iBBWANT_WebsockCallback(struct lws *wsi, enum lws_callback_reasons re
   case LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER:
     // Clean headers.
     u8BBWANT_WebsockRemoveFromHeaderData(in, "http://https://", strlen("http://"));
-    u8BBWANT_WebsockRemoveFromHeaderData(in, "Sec-WebSocket-Protocol", BBWANT_WEBSOCK_REMOVE_HEADER_DATE_LINE);
+    u8BBWANT_WebsockRemoveFromHeaderData(in, "Sec-WebSocket-Protocol", BBWANT_WEBSOCK_REMOVE_SINGLE_HEADER);
     break;
   default:
     break;
