@@ -109,8 +109,8 @@ uint8_t u8BBWANT_Client_Default_Actions(tBBWANT_Client_State* pxClientState)
   uint8_t u8RetVal = BBWANT_OK;
   tBBWANT_ConnState* pxTempConnection;
 
-  u8RetVal = u8BBWANT_AllocateConnection("wss://web.whatsapp.com/ws", "https://web.whatsapp.com", &pxTempConnection);
-  u8BBWANT_FreeConnection(pxTempConnection);
+  u8RetVal = u8BBWANT_WebsocketAllocateConnection("wss://web.whatsapp.com/ws", "https://web.whatsapp.com", &pxTempConnection);
+  u8BBWANT_WebsocketFreeConnection(pxTempConnection);
 
   return u8RetVal;
 }

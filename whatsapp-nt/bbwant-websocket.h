@@ -10,9 +10,9 @@
 
 typedef struct
 {
-  char* sWebsockUrlPartStore; // Gets mutilated eventually
-  char* sWebsockOriginUrlStore;
-  char* sWebsockRealPathStore;
+  char* sWebsocketUrlPartStore; // Gets mutilated eventually
+  char* sWebsocketOriginUrlStore;
+  char* sWebsocketRealPathStore;
   struct lws_client_connect_info* pxWsClientConnectInfo;
   struct lws_context_creation_info* pxWsContextCreationInfo;
   struct lws_context* pxWsContext;
@@ -20,9 +20,9 @@ typedef struct
 } tBBWANT_ConnState;
 
 
-uint8_t u8BBWANT_AllocateConnection(const char* sWsUrl, const char* sOriginUrl,
+uint8_t u8BBWANT_WebsocketAllocateConnection(const char* sWsUrl, const char* sOriginUrl,
 					   tBBWANT_ConnState** ppxConnState);
-uint8_t u8BBWANT_FreeConnection(tBBWANT_ConnState* pxConnState);
-tBBWANT_ConnState* pxBBWANT_GetSetWebsockContext(tBBWANT_ConnState** ppxConnState);  
+uint8_t u8BBWANT_WebsocketFreeConnection(tBBWANT_ConnState* pxConnState);
+tBBWANT_ConnState* pxBBWANT_WebsocketGetSetContext(tBBWANT_ConnState** ppxConnState);  
 
 #endif // #ifndef _BBWANT_WEBSOCKET_H_
