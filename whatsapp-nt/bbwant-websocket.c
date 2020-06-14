@@ -285,6 +285,7 @@ static int iBBWANT_Websocket_Callback(struct lws *wsi, enum lws_callback_reasons
   case LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER:
     // Clean headers.
     u8BBWANT_Websocket_RemoveFromHeaderData(in, "http://https://", strlen("http://"));
+    u8BBWANT_Websocket_RemoveFromHeaderData(in, "http://http://", strlen("http://"));
     u8BBWANT_Websocket_RemoveFromHeaderData(in, "Sec-WebSocket-Protocol", BBWANT_WEBSOCKET_REMOVE_SINGLE_HEADER);
     break;
   default:
