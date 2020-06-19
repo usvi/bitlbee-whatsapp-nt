@@ -1,6 +1,7 @@
 
 bin_PROGRAMS = \
-	bbwhatsapp-nt-client
+	bbwhatsapp-nt-client \
+	bbwhatsapp-nt-tester-websocket
 
 
 
@@ -30,17 +31,18 @@ bbwhatsapp_nt_client_SOURCES = \
 
 
 
-#bbwhatsapp_nt_client_websocket_LDFLAGS = \
-#	$(GNUTLS_LIBS)
+bbwhatsapp_nt_tester_websocket_LDFLAGS = \
+	$(GNUTLS_LIBS)
 
-#bbwhatsapp_nt_client_websocket_CFLAGS = \
-#	-Wall \
-#	-g
+bbwhatsapp_nt_tester_websocket_CFLAGS = \
+	-Wall \
+	-g
 
-#bbwhatsapp_nt_client_websocket_SOURCES = \
-#	bbwant.h \
-#	bbwant-corewebsocket.c \
-#	bbwant-corewebsocket.h \
-#	bbwant-corewebsocket-client.c \
-#	bbwant-corewebsocket-client.h
+bbwhatsapp_nt_tester_websocket_SOURCES = \
+	bbwant.h \
+	bbwant-corewebsocket.c \
+	bbwant-corewebsocket.h \
+	bbwant-tester-websocket.c \
+	bbwant-tester-websocket.h
+
 
