@@ -18,7 +18,7 @@
 
 #define MAX_BUF 1024
 #define CAFILE "/etc/ssl/certs/ca-certificates.crt"
-#define MSG "GET / HTTP/1.0\r\n\r\n"
+#define MSG "GET / HTTP/1.1\r\nHost: www.hs.fi\r\n\r\n"
 
 extern int tcp_connect(void);
 extern void tcp_close(int sd);
@@ -63,29 +63,18 @@ int main(void)
          */
         gnutls_init(&session, GNUTLS_CLIENT);
 
-        gnutls_session_set_ptr(session, (void *) "my_host_name");
+        gnutls_session_set_ptr(session, (void *) "www.hs.fi");
 
-        gnutls_server_name_set(session, GNUTLS_NAME_DNS, "my_host_name",
-                               strlen("my_host_name"));
+        gnutls_server_name_set(session, GNUTLS_NAME_DNS, "www.hs.fi",
+                               strlen("www.hs.fi"));
 
         /* It is recommended to use the default priorities */
         gnutls_set_default_priority(session);
-#if 0
-	/* if more fine-graned control is required */
-        ret = gnutls_priority_set_direct(session, 
-                                         "NORMAL", &err);
-        if (ret < 0) {
-                if (ret == GNUTLS_E_INVALID_REQUEST) {
-                        fprintf(stderr, "Syntax error at: %s\n", err);
-                }
-                exit(1);
-        }
-#endif
 
         /* put the x509 credentials to the current session
          */
         gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
-        gnutls_session_set_verify_cert(session, "my_host_name", 0);
+        gnutls_session_set_verify_cert(session, "www.hs.fi", 0);
 
         /* connect to the peer
          */
