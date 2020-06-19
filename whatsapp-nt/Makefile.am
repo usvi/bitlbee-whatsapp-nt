@@ -1,5 +1,7 @@
 
-bin_PROGRAMS = bbwhatsapp-nt-client
+bin_PROGRAMS = \
+	bbwhatsapp-nt-client
+
 
 
 bbwhatsapp_nt_client_LDFLAGS = \
@@ -25,3 +27,20 @@ bbwhatsapp_nt_client_SOURCES = \
 	bbwant-client-appdir.h \
 	bbwant-client-qrencode.c \
 	bbwant-client-qrencode.h
+
+
+
+#bbwhatsapp_nt_client_websocket_LDFLAGS = \
+#	$(GNUTLS_LIBS)
+
+#bbwhatsapp_nt_client_websocket_CFLAGS = \
+#	-Wall \
+#	-g
+
+#bbwhatsapp_nt_client_websocket_SOURCES = \
+#	bbwant.h \
+#	bbwant-corewebsocket.c \
+#	bbwant-corewebsocket.h \
+#	bbwant-corewebsocket-client.c \
+#	bbwant-corewebsocket-client.h
+

@@ -79,6 +79,7 @@ AC_ARG_WITH(
 )
 
 PKG_CHECK_MODULES([BITLBEE], [bitlbee >= 3.4])
+PKG_CHECK_MODULES([GNUTLS], [gnutls >= 3.4.10])
 #PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.28.0 gio-2.0 gobject-2.0])
 #PKG_CHECK_MODULES([JSON], [json-glib-1.0 >= 0.14.0])
 PKG_CHECK_MODULES([PNG], [libpng >= 1.6.0])

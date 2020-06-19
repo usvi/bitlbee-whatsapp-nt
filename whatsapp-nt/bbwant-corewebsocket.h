@@ -1,0 +1,6 @@
+#ifndef _BBWANT_COREWEBSOCKET_H_
+#define _BBWANT_COREWEBSOCKET_H_
+
+
+
+#endif // #ifndef_BBWANT_COREWEBSOCKET_H_
