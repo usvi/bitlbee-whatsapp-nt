@@ -1,7 +1,7 @@
 #include "bbwant-client.h"
 #include "bbwant.h"
 #include "bbwant-client-qrencode.h"
-#include "bbwant-websocket.h"
+#include "bbwant-libwebsocket.h"
 #include "bbwant-client-appdir.h"
 
 #include <stdio.h>
@@ -123,7 +123,7 @@ uint8_t u8BBWANT_Client_Default_Actions(tBBWANT_Client_State* pxClientState)
   }
   /*
   tBBWANT_ConnState* pxTempConnection;
-  u8RetVal = u8BBWANT_Websocket_AllocateConnection(&pxTempConnection);
+  u8RetVal = u8BBWANT_LibWebsocket_AllocateConnection(&pxTempConnection);
 
   if (u8RetVal != BBWANT_OK)
   {
@@ -131,9 +131,9 @@ uint8_t u8BBWANT_Client_Default_Actions(tBBWANT_Client_State* pxClientState)
   }
   else
   {
-    pxBBWANT_Websocket_GetSetContext(&pxTempConnection);
-    u8RetVal = u8BBWANT_Websocket_BuildConnection("wss://web.whatsapp.com/ws", "https://web.whatsapp.com", &pxTempConnection);
-    //u8RetVal = u8BBWANT_Websocket_BuildConnection("ws://echo.websocket.org/?encoding=text", "https://www.websocket.org", &pxTempConnection);
+    pxBBWANT_LibWebsocket_GetSetContext(&pxTempConnection);
+    u8RetVal = u8BBWANT_LibWebsocket_BuildConnection("wss://web.whatsapp.com/ws", "https://web.whatsapp.com", &pxTempConnection);
+    //u8RetVal = u8BBWANT_LibWebsocket_BuildConnection("ws://echo.websocket.org/?encoding=text", "https://www.websocket.org", &pxTempConnection);
 
     if (u8RetVal != BBWANT_OK)
     {
@@ -141,18 +141,18 @@ uint8_t u8BBWANT_Client_Default_Actions(tBBWANT_Client_State* pxClientState)
     }
     else
     {
-      u8RetVal = u8BBWANT_Websocket_Connect(&pxTempConnection);
+      u8RetVal = u8BBWANT_LibWebsocket_Connect(&pxTempConnection);
 
       if (u8RetVal == BBWANT_OK)
       {
 	// Manage loop
 	// Disconnect
-	u8RetVal = u8BBWANT_Websocket_Disconnect(&pxTempConnection);
+	u8RetVal = u8BBWANT_LibWebsocket_Disconnect(&pxTempConnection);
       }
     }
   }
   
-  u8BBWANT_Websocket_FreeConnection(pxTempConnection);
+  u8BBWANT_LibWebsocket_FreeConnection(pxTempConnection);
   */
   
   return u8RetVal;

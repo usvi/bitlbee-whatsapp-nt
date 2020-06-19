@@ -1,4 +1,4 @@
-#include "bbwant-websocket.h"
+#include "bbwant-libwebsocket.h"
 #include "bbwant.h"
 
 #include <stdint.h>
@@ -10,7 +10,7 @@
 #define BBWANT_WEBSOCKET_REMOVE_SINGLE_HEADER (-1)
 
 
-tBBWANT_ConnState* pxBBWANT_Websocket_GetSetContext(tBBWANT_ConnState** ppxConnState)
+tBBWANT_ConnState* pxBBWANT_LibWebsocket_GetSetContext(tBBWANT_ConnState** ppxConnState)
 {
   static tBBWANT_ConnState* pxStoredConnState = NULL;
 
@@ -22,7 +22,7 @@ tBBWANT_ConnState* pxBBWANT_Websocket_GetSetContext(tBBWANT_ConnState** ppxConnS
   return pxStoredConnState;
 }
 
-static void BBWANT_Websocket_PrintCbReason(enum lws_callback_reasons reason)
+static void BBWANT_LibWebsocket_PrintCbReason(enum lws_callback_reasons reason)
 {
   switch (reason)
   {
@@ -152,7 +152,7 @@ static void BBWANT_Websocket_PrintCbReason(enum lws_callback_reasons reason)
 }
 
 
-static uint8_t u8BBWANT_Websocket_RemoveFromHeaderData(void *pHeaderData, char* sSearchKey, int16_t i16HowMuch)
+static uint8_t u8BBWANT_LibWebsocket_RemoveFromHeaderData(void *pHeaderData, char* sSearchKey, int16_t i16HowMuch)
 {
   uint8_t u8RetVal = BBWANT_OK;
   uint16_t u16i = 0;
@@ -265,28 +265,28 @@ static uint8_t u8BBWANT_Websocket_RemoveFromHeaderData(void *pHeaderData, char* 
 }
 
 
-static int iBBWANT_Websocket_Callback(struct lws *wsi, enum lws_callback_reasons reason,
+static int iBBWANT_LibWebsocket_Callback(struct lws *wsi, enum lws_callback_reasons reason,
 				      void *user, void *in, size_t len)
 {
   tBBWANT_ConnState* pxConnState = NULL;
   
-  BBWANT_Websocket_PrintCbReason(reason);
+  BBWANT_LibWebsocket_PrintCbReason(reason);
   
   switch (reason)
   {
   case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
-    pxConnState = pxBBWANT_Websocket_GetSetContext(NULL);
+    pxConnState = pxBBWANT_LibWebsocket_GetSetContext(NULL);
     pxConnState->u8Connecting = 0;
     break;
   case LWS_CALLBACK_CLIENT_ESTABLISHED:
-    pxConnState = pxBBWANT_Websocket_GetSetContext(NULL);
+    pxConnState = pxBBWANT_LibWebsocket_GetSetContext(NULL);
     pxConnState->u8Connecting = 0;
     break;
   case LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER:
     // Clean headers.
-    u8BBWANT_Websocket_RemoveFromHeaderData(in, "http://https://", strlen("http://"));
-    u8BBWANT_Websocket_RemoveFromHeaderData(in, "http://http://", strlen("http://"));
-    u8BBWANT_Websocket_RemoveFromHeaderData(in, "Sec-WebSocket-Protocol", BBWANT_WEBSOCKET_REMOVE_SINGLE_HEADER);
+    u8BBWANT_LibWebsocket_RemoveFromHeaderData(in, "http://https://", strlen("http://"));
+    u8BBWANT_LibWebsocket_RemoveFromHeaderData(in, "http://http://", strlen("http://"));
+    u8BBWANT_LibWebsocket_RemoveFromHeaderData(in, "Sec-WebSocket-Protocol", BBWANT_WEBSOCKET_REMOVE_SINGLE_HEADER);
     break;
   default:
     break;
@@ -296,11 +296,11 @@ static int iBBWANT_Websocket_Callback(struct lws *wsi, enum lws_callback_reasons
 }
   
 
-static struct lws_protocols axBBWANT_Websocket_Protocols[] =
+static struct lws_protocols axBBWANT_LibWebsocket_Protocols[] =
 {
   {
     "whatsapp-nt-minimal-client",
-    iBBWANT_Websocket_Callback,
+    iBBWANT_LibWebsocket_Callback,
     0,
     4000,
   },
@@ -308,7 +308,7 @@ static struct lws_protocols axBBWANT_Websocket_Protocols[] =
 };
 
 
-static const struct lws_extension axBBWANT_Websocket_Exts[] =
+static const struct lws_extension axBBWANT_LibWebsocket_Exts[] =
 {
   {
     "permessage-deflate",
@@ -324,7 +324,7 @@ static const struct lws_extension axBBWANT_Websocket_Exts[] =
 };
 
 
-uint8_t u8BBWANT_Websocket_AllocateConnection(tBBWANT_ConnState** ppxConnState)
+uint8_t u8BBWANT_LibWebsocket_AllocateConnection(tBBWANT_ConnState** ppxConnState)
 {
   // Everything needs to be malloced and zeroed.
   uint8_t u8RetVal = BBWANT_OK;
@@ -389,7 +389,7 @@ uint8_t u8BBWANT_Websocket_AllocateConnection(tBBWANT_ConnState** ppxConnState)
   return u8RetVal;
 }
     
-uint8_t u8BBWANT_Websocket_BuildConnection(const char* sWsUrl, const char* sOriginUrl,
+uint8_t u8BBWANT_LibWebsocket_BuildConnection(const char* sWsUrl, const char* sOriginUrl,
 					   tBBWANT_ConnState** ppxConnState)
 {
   uint8_t u8RetVal = BBWANT_OK;
@@ -423,7 +423,7 @@ uint8_t u8BBWANT_Websocket_BuildConnection(const char* sWsUrl, const char* sOrig
     pxConnState->pxWsClientConnectInfo->path = pxConnState->sWebsocketRealPathStore;
 
     pxConnState->pxWsContextCreationInfo->port = CONTEXT_PORT_NO_LISTEN;
-    pxConnState->pxWsContextCreationInfo->protocols = axBBWANT_Websocket_Protocols;
+    pxConnState->pxWsContextCreationInfo->protocols = axBBWANT_LibWebsocket_Protocols;
     pxConnState->pxWsContextCreationInfo->gid = -1;
     pxConnState->pxWsContextCreationInfo->uid = -1;
 
@@ -451,16 +451,16 @@ uint8_t u8BBWANT_Websocket_BuildConnection(const char* sWsUrl, const char* sOrig
       pxConnState->pxWsClientConnectInfo->host = pxConnState->pxWsClientConnectInfo->address;
       pxConnState->pxWsClientConnectInfo->origin = pxConnState->sWebsocketOriginUrlStore;
       pxConnState->pxWsClientConnectInfo->ietf_version_or_minus_one = -1;
-      pxConnState->pxWsClientConnectInfo->client_exts = axBBWANT_Websocket_Exts;
+      pxConnState->pxWsClientConnectInfo->client_exts = axBBWANT_LibWebsocket_Exts;
 
-      pxConnState->pxWsClientConnectInfo->protocol = axBBWANT_Websocket_Protocols[0].name;
+      pxConnState->pxWsClientConnectInfo->protocol = axBBWANT_LibWebsocket_Protocols[0].name;
     }
   }
   
   return u8RetVal;
 }
 
-uint8_t u8BBWANT_Websocket_Connect(tBBWANT_ConnState** ppxConnState)
+uint8_t u8BBWANT_LibWebsocket_Connect(tBBWANT_ConnState** ppxConnState)
 {
   uint8_t u8RetVal = BBWANT_OK;
   tBBWANT_ConnState* pxConnState = NULL;
@@ -487,7 +487,7 @@ uint8_t u8BBWANT_Websocket_Connect(tBBWANT_ConnState** ppxConnState)
   return u8RetVal;
 }
 
-uint8_t u8BBWANT_Websocket_Disconnect(tBBWANT_ConnState** ppxConnState)
+uint8_t u8BBWANT_LibWebsocket_Disconnect(tBBWANT_ConnState** ppxConnState)
 {
   uint8_t u8RetVal = BBWANT_OK;
   tBBWANT_ConnState* pxConnState = NULL;
@@ -500,7 +500,7 @@ uint8_t u8BBWANT_Websocket_Disconnect(tBBWANT_ConnState** ppxConnState)
   return u8RetVal;
 }
 
-uint8_t u8BBWANT_Websocket_FreeConnection(tBBWANT_ConnState* pxConnState)
+uint8_t u8BBWANT_LibWebsocket_FreeConnection(tBBWANT_ConnState* pxConnState)
 {
   uint8_t u8RetVal = BBWANT_OK;
 

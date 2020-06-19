@@ -17,8 +17,8 @@ bbwhatsapp_nt_client_SOURCES = \
 	bbwant-curve25519-donna.h \
 	bbwant-base64.c \
 	bbwant-base64.h \
-	bbwant-websocket.c \
-	bbwant-websocket.h \
+	bbwant-libwebsocket.c \
+	bbwant-libwebsocket.h \
 	bbwant-client.c \
 	bbwant-client.h \
 	bbwant-client-appdir.c \
