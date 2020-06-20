@@ -347,11 +347,11 @@ uint8_t u8BBWANT_LibWebsocket_AllocateConnection(tBBWANT_ConnState** ppxConnStat
     // Everything sele can be set sequantially now
     
     pxNewConnState->sWebsocketUrlPartStore = NULL;
-    pxNewConnState->sWebsocketUrlPartStore = malloc(BBWANT_URL_PATH_SIZE);
+    pxNewConnState->sWebsocketUrlPartStore = malloc(BBWANT_URL_SIZE);
     pxNewConnState->sWebsocketOriginUrlStore = NULL;
-    pxNewConnState->sWebsocketOriginUrlStore = malloc(BBWANT_URL_PATH_SIZE);
+    pxNewConnState->sWebsocketOriginUrlStore = malloc(BBWANT_URL_SIZE);
     pxNewConnState->sWebsocketRealPathStore = NULL;
-    pxNewConnState->sWebsocketRealPathStore = malloc(BBWANT_URL_PATH_SIZE);
+    pxNewConnState->sWebsocketRealPathStore = malloc(BBWANT_URL_SIZE);
     pxNewConnState->pxWsClientConnectInfo = NULL;
     pxNewConnState->pxWsClientConnectInfo = malloc(sizeof(struct lws_client_connect_info));
     pxNewConnState->pxWsContextCreationInfo = NULL;
@@ -375,9 +375,9 @@ uint8_t u8BBWANT_LibWebsocket_AllocateConnection(tBBWANT_ConnState** ppxConnStat
     else
     {
       // All malloc'd, good. Zero everything in one go.
-      memset(pxNewConnState->sWebsocketUrlPartStore, 0, BBWANT_URL_PATH_SIZE);
-      memset(pxNewConnState->sWebsocketOriginUrlStore, 0, BBWANT_URL_PATH_SIZE);
-      memset(pxNewConnState->sWebsocketRealPathStore, 0, BBWANT_URL_PATH_SIZE);
+      memset(pxNewConnState->sWebsocketUrlPartStore, 0, BBWANT_URL_SIZE);
+      memset(pxNewConnState->sWebsocketOriginUrlStore, 0, BBWANT_URL_SIZE);
+      memset(pxNewConnState->sWebsocketRealPathStore, 0, BBWANT_URL_SIZE);
       memset(pxNewConnState->pxWsClientConnectInfo, 0, sizeof(*(pxNewConnState->pxWsClientConnectInfo)));
       memset(pxNewConnState->pxWsContextCreationInfo, 0, sizeof(*(pxNewConnState->pxWsContextCreationInfo)));
       pxNewConnState->pxWsContext = NULL;
@@ -402,8 +402,8 @@ uint8_t u8BBWANT_LibWebsocket_BuildConnection(const char* sWsUrl, const char* sO
 
   // And now, do somewhat what we saw in the original websockets library
   // test-client.c
-  strncpy(pxConnState->sWebsocketUrlPartStore, sWsUrl, BBWANT_URL_PATH_SIZE - 1);
-  strncpy(pxConnState->sWebsocketOriginUrlStore, sOriginUrl, BBWANT_URL_PATH_SIZE - 1);
+  strncpy(pxConnState->sWebsocketUrlPartStore, sWsUrl, BBWANT_URL_SIZE - 1);
+  strncpy(pxConnState->sWebsocketOriginUrlStore, sOriginUrl, BBWANT_URL_SIZE - 1);
 
   pxConnState->pxWsClientConnectInfo->port = BBWANT_DEFAULT_WS_PORT;
   iTemp = lws_parse_uri(pxConnState->sWebsocketUrlPartStore, &sParsedProto,
@@ -419,7 +419,7 @@ uint8_t u8BBWANT_LibWebsocket_BuildConnection(const char* sWsUrl, const char* sO
   {
     // Add back leading /
     pxConnState->sWebsocketRealPathStore[0] = '/';
-    strncpy(pxConnState->sWebsocketRealPathStore + 1, sParsedPath, BBWANT_URL_PATH_SIZE - 2);
+    strncpy(pxConnState->sWebsocketRealPathStore + 1, sParsedPath, BBWANT_URL_SIZE - 2);
     pxConnState->pxWsClientConnectInfo->path = pxConnState->sWebsocketRealPathStore;
 
     pxConnState->pxWsContextCreationInfo->port = CONTEXT_PORT_NO_LISTEN;

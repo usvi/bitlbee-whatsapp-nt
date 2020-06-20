@@ -2,6 +2,7 @@
 #define _BBWANT_COREWEBSOCKET_H_
 
 #include "bbwant.h"
+#include <stdint.h>
 
 /*
 
@@ -24,5 +25,15 @@ typedef struct
 tBBWANT_ConnState* pxBBWANT_LibWebsocket_GetSetContext(tBBWANT_ConnState** ppxConnState);
 */
 
+typedef struct
+{
+  
+  
+} tBBWANT_CoreWebsocketUrl;
+
+typedef struct
+{
+  
+} tBBWANT_CoreWebsocketState;
 
 #endif // #ifndef_BBWANT_COREWEBSOCKET_H_
