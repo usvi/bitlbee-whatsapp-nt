@@ -4,26 +4,6 @@
 #include "bbwant.h"
 #include <stdint.h>
 
-/*
-
-typedef struct
-{
-  char sWebsocketDomain[BBWANT_URL_PATH_SIZE];
-  char sWebsocketPath[BBWANT_URL_PATH_SIZE];
-  char* sWebsocketUrlPartStore; // Gets mutilated eventually
-  char* sWebsocketOriginUrlStore;
-  char* sWebsocketRealPathStore;
-  struct lws_client_connect_info* pxWsClientConnectInfo;
-  struct lws_context_creation_info* pxWsContextCreationInfo;
-  struct lws_context* pxWsContext;
-  struct lws* pxConnection;
-  uint8_t u8Connecting;
-
-} tBBWANT_ConnState;
-
-
-tBBWANT_ConnState* pxBBWANT_LibWebsocket_GetSetContext(tBBWANT_ConnState** ppxConnState);
-*/
 
 typedef struct
 {
@@ -40,5 +20,24 @@ typedef struct
   tBBWANT_CoreWebsocketUrl xUrl;
   
 } tBBWANT_CoreWebsocketState;
+
+
+#define BBWANT_COREWEBSOCKET_CB_ERR_FATAL (((uint32_t)1) << 0)
+#define BBWANT_COREWEBSOCKET_CB_ERR_TOO_BIG (((uint32_t)1) << 1)
+#define BBWANT_COREWEBSOCKET_CB_CONNECTING (((uint32_t)1) << 2)
+#define BBWANT_COREWEBSOCKET_CB_CONNECTED (((uint32_t)1) << 3)
+#define BBWANT_COREWEBSOCKET_CB_DISCONNECTING (((uint32_t)1) << 4)
+#define BBWANT_COREWEBSOCKET_CB_MSGS_REMAIN (((uint32_t)1) << 5)
+
+
+
+uint8_t u8BBWANT_CoreWebsocket_Init(char* sWebsocketUrl);
+uint8_t u8BBWANT_CoreWebsocket_SetConnect(void);
+uint32_t u32BBWANT_CoreWebsocket_Service(void);
+uint32_t u32BBWANT_CoreWebsocket_QueueForSend(void* pData, uint32_t u32Size);
+uint32_t u32BBWANT_CoreWebsocket_DequeueReceived(void* pData, uint32_t u32Size);
+uint8_t u8BBWANT_CoreWebsocket_SetDisconnect(void);
+uint8_t u8BBWANT_CoreWebsocket_Deinit(void);
+
 
 #endif // #ifndef_BBWANT_COREWEBSOCKET_H_
