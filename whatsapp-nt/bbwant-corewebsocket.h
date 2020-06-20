@@ -27,12 +27,17 @@ tBBWANT_ConnState* pxBBWANT_LibWebsocket_GetSetContext(tBBWANT_ConnState** ppxCo
 
 typedef struct
 {
-  
+  char sHostname[BBWANT_URL_SIZE];
+  uint16_t u16Port;
+  uint8_t u8Secure;
+  char sPath[BBWANT_URL_SIZE];
+  char sOrigin[BBWANT_URL_SIZE];
   
 } tBBWANT_CoreWebsocketUrl;
 
 typedef struct
 {
+  tBBWANT_CoreWebsocketUrl xUrl;
   
 } tBBWANT_CoreWebsocketState;
 
