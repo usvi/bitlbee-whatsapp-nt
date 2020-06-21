@@ -2,12 +2,14 @@
 
 #include <stddef.h>
 #include <string.h>
-
+#include <stdlib.h>
+#include <stdio.h>
 
 //static tBBWANT_CoreWebsocketState* gpxWebsocketState = NULL;
 
 
-static uint8_t u8BBWANT_CoreWebsocket_ParseUrl(char* sWebsocketUrl)
+static uint8_t u8BBWANT_CoreWebsocket_ParseUrl(tBBWANT_CoreWebsocketUrl* pxUrl,
+					       char* sWebsocketUrl)
 {
   uint8_t u8RetVal = BBWANT_OK;
   // We could get any of these
@@ -18,7 +20,7 @@ static uint8_t u8BBWANT_CoreWebsocket_ParseUrl(char* sWebsocketUrl)
   // ws://foo/baz
   // ws://foo/
 
-  /*
+
   char sUrlBuf[BBWANT_URL_SIZE] = { 0 };
   strncpy(sUrlBuf, sWebsocketUrl, sizeof(sUrlBuf));
 
@@ -28,12 +30,20 @@ static uint8_t u8BBWANT_CoreWebsocket_ParseUrl(char* sWebsocketUrl)
 
     return u8RetVal;
   }
-  
-  if (strstr(sUrlBuf, 
-  
-  */
-  //if (strncmp(sWebsocketUrl,
 
+  printf(">%s<\n", sUrlBuf);
+  
+  if (strncmp(sUrlBuf, "ws://", strlen("ws://")) == 0)
+  {
+    memmove(sUrlBuf, sUrlBuf + strlen("ws://"), BBWANT_URL_SIZE - strlen("ws://"));
+    memset(sUrlBuf + BBWANT_URL_SIZE - strlen("ws://"), 0, strlen("ws://"));
+  }
+  else if (strncmp(sUrlBuf, "wss://", strlen("wss://")) == 0)
+  {
+    memmove(sUrlBuf, sUrlBuf + strlen("wss://"), BBWANT_URL_SIZE - strlen("wss://"));
+    memset(sUrlBuf + BBWANT_URL_SIZE - strlen("wss://"), 0, strlen("wss://"));
+  }
+ 
   return u8RetVal;
 }
 
@@ -44,6 +54,21 @@ uint8_t u8BBWANT_CoreWebsocket_Init(tBBWANT_CoreWebsocketState** ppxWebsocketSta
 {
   uint8_t u8RetVal = BBWANT_OK;
 
+  *ppxWebsocketState = malloc(sizeof(tBBWANT_CoreWebsocketState));
+
+  if (*ppxWebsocketState == NULL)
+  {
+    u8RetVal = BBWANT_ERROR;
+
+    return u8RetVal;
+  }
+  u8RetVal = u8BBWANT_CoreWebsocket_ParseUrl(&((*ppxWebsocketState)->xUrl), sWebsocketUrl);
+
+  if (u8RetVal == BBWANT_ERROR)
+  {
+    return u8RetVal;
+  }
+  
   
   return u8RetVal;
 }
@@ -89,7 +114,10 @@ uint8_t u8BBWANT_CoreWebsocket_Deinit(tBBWANT_CoreWebsocketState** ppxWebsocketS
 {
   uint8_t u8RetVal = BBWANT_OK;
 
-  // Previously
+  if (*ppxWebsocketState != NULL)
+  {
+    free(*ppxWebsocketState);
+  }
 
   return u8RetVal;
 }
