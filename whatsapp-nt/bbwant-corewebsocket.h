@@ -31,8 +31,9 @@ typedef struct
 
 
 
-uint8_t u8BBWANT_CoreWebsocket_Init(tBBWANT_CoreWebsocketState** ppxWebsocketState,
-				    char* sWebsocketUrl, char* sWebsocketOrigin);
+uint8_t u8BBWANT_CoreWebsocket_Init(tBBWANT_CoreWebsocketState** ppxWebsocketState);
+uint8_t u8BBWANT_CoreWebsocket_ParseUrls(tBBWANT_CoreWebsocketState** ppxWebsocketState,
+					 char* sWebsocketUrl, char* sOriginUrl);
 uint8_t u8BBWANT_CoreWebsocket_SetConnect(tBBWANT_CoreWebsocketState** ppxWebsocketState);
 uint32_t u32BBWANT_CoreWebsocket_Service(tBBWANT_CoreWebsocketState** ppxWebsocketState);
 uint32_t u32BBWANT_CoreWebsocket_QueueForSend(tBBWANT_CoreWebsocketState** ppxWebsocketState,

@@ -4,12 +4,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <inttypes.h>
 
 //static tBBWANT_CoreWebsocketState* gpxWebsocketState = NULL;
 
 
-static uint8_t u8BBWANT_CoreWebsocket_ParseUrl(tBBWANT_CoreWebsocketUrl* pxUrl,
-					       char* sWebsocketUrl)
+uint8_t u8BBWANT_CoreWebsocket_ParseUrls(tBBWANT_CoreWebsocketState** ppxWebsocketState,
+					 char* sWebsocketUrl, char* sOriginUrl)
 {
   uint8_t u8RetVal = BBWANT_OK;
   // We could get any of these
@@ -36,16 +37,12 @@ static uint8_t u8BBWANT_CoreWebsocket_ParseUrl(tBBWANT_CoreWebsocketUrl* pxUrl,
   {
     memmove(sUrlBuf, sUrlBuf + strlen("ws://"), BBWANT_URL_SIZE - strlen("ws://"));
     memset(sUrlBuf + BBWANT_URL_SIZE - strlen("ws://"), 0, strlen("ws://"));
-
-    printf("Got unsecure\n");
   }
   else if (strncmp(sUrlBuf, "wss://", strlen("wss://")) == 0)
   {
     memmove(sUrlBuf, sUrlBuf + strlen("wss://"), BBWANT_URL_SIZE - strlen("wss://"));
     memset(sUrlBuf + BBWANT_URL_SIZE - strlen("wss://"), 0, strlen("wss://"));
-    pxUrl->u8Secure = 1;
-    
-    printf("Got secure\n");
+    ((*ppxWebsocketState)->xUrl).u8Secure = 1;
   }
   else
   {
@@ -63,24 +60,41 @@ static uint8_t u8BBWANT_CoreWebsocket_ParseUrl(tBBWANT_CoreWebsocketUrl* pxUrl,
     return u8RetVal;
   }
   // Copy out amount of length find, eg. sBufPos - sUrlBuf
-  memcpy(pxUrl->sHostname, sUrlBuf, sBufPos - sUrlBuf);
+  memcpy(((*ppxWebsocketState)->xUrl).sHostname, sUrlBuf, sBufPos - sUrlBuf);
   // Move to left by the amount found
   memmove(sUrlBuf, sBufPos, sBufPos - sUrlBuf);
   // Zero rest of buffer, just in case
   memset(sUrlBuf + strlen(sBufPos), 0, BBWANT_URL_SIZE - strlen(sBufPos));
-
   // Hostname can have :81, so check:
-  
-  printf("Got hostname >%s<\n", pxUrl->sHostname);
-  printf("Continuing with >%s<\n", sUrlBuf);
+
+  if ((sBufPos = strstr(((*ppxWebsocketState)->xUrl).sHostname, ":")) != NULL)
+  {
+    // OK we need to try to parse it
+    *sBufPos = 0;
+    sBufPos++; // We need to memset to zero later from this
+
+    if (sscanf(sBufPos, "%u", (unsigned int*)(&(((*ppxWebsocketState)->xUrl).u16Port))) != 1)
+    {
+      // Something went wrong
+      u8RetVal = BBWANT_ERROR;
+
+      return u8RetVal;
+    }
+    // Otherwise all ok! Just need to zero stuff just in case.
+
+    memset(((*ppxWebsocketState)->xUrl).sHostname + strlen(((*ppxWebsocketState)->xUrl).sHostname),
+	   0, BBWANT_URL_SIZE - strlen(((*ppxWebsocketState)->xUrl).sHostname));
+
+  }
+  // If we are here, last part is path and ok to 
+  memcpy(((*ppxWebsocketState)->xUrl).sPath, sUrlBuf, strlen(sUrlBuf));
   
   return u8RetVal;
 }
 
 
 
-uint8_t u8BBWANT_CoreWebsocket_Init(tBBWANT_CoreWebsocketState** ppxWebsocketState,
-				    char* sWebsocketUrl, char* sWebsocketOrigin)
+uint8_t u8BBWANT_CoreWebsocket_Init(tBBWANT_CoreWebsocketState** ppxWebsocketState)
 {
   uint8_t u8RetVal = BBWANT_OK;
 
@@ -94,14 +108,6 @@ uint8_t u8BBWANT_CoreWebsocket_Init(tBBWANT_CoreWebsocketState** ppxWebsocketSta
   }
   memset(*ppxWebsocketState, 0, sizeof(tBBWANT_CoreWebsocketState));
 	 
-  u8RetVal = u8BBWANT_CoreWebsocket_ParseUrl(&((*ppxWebsocketState)->xUrl), sWebsocketUrl);
-
-  if (u8RetVal == BBWANT_ERROR)
-  {
-    return u8RetVal;
-  }
-  
-  
   return u8RetVal;
 }
 
