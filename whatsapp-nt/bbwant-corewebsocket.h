@@ -31,13 +31,16 @@ typedef struct
 
 
 
-uint8_t u8BBWANT_CoreWebsocket_Init(char* sWebsocketUrl);
-uint8_t u8BBWANT_CoreWebsocket_SetConnect(void);
-uint32_t u32BBWANT_CoreWebsocket_Service(void);
-uint32_t u32BBWANT_CoreWebsocket_QueueForSend(void* pData, uint32_t u32Size);
-uint32_t u32BBWANT_CoreWebsocket_DequeueReceived(void* pData, uint32_t u32Size);
-uint8_t u8BBWANT_CoreWebsocket_SetDisconnect(void);
-uint8_t u8BBWANT_CoreWebsocket_Deinit(void);
+uint8_t u8BBWANT_CoreWebsocket_Init(tBBWANT_CoreWebsocketState** ppxWebsocketState,
+				    char* sWebsocketUrl, char* sWebsocketOrigin);
+uint8_t u8BBWANT_CoreWebsocket_SetConnect(tBBWANT_CoreWebsocketState** ppxWebsocketState);
+uint32_t u32BBWANT_CoreWebsocket_Service(tBBWANT_CoreWebsocketState** ppxWebsocketState);
+uint32_t u32BBWANT_CoreWebsocket_QueueForSend(tBBWANT_CoreWebsocketState** ppxWebsocketState,
+					      void* pData, uint32_t u32Size);
+uint32_t u32BBWANT_CoreWebsocket_DequeueReceived(tBBWANT_CoreWebsocketState** ppxWebsocketState,
+						 void* pData, uint32_t u32Size);
+uint8_t u8BBWANT_CoreWebsocket_SetDisconnect(tBBWANT_CoreWebsocketState** ppxWebsocketState);
+uint8_t u8BBWANT_CoreWebsocket_Deinit(tBBWANT_CoreWebsocketState** ppxWebsocketState);
 
 
 #endif // #ifndef_BBWANT_COREWEBSOCKET_H_
