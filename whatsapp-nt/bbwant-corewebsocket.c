@@ -89,6 +89,14 @@ uint8_t u8BBWANT_CoreWebsocket_ParseUrls(tBBWANT_CoreWebsocketState** ppxWebsock
   // If we are here, last part is path and ok to 
   memcpy(((*ppxWebsocketState)->xUrl).sPath, sUrlBuf, strlen(sUrlBuf));
   
+  strncpy(((*ppxWebsocketState)->xUrl).sOrigin, sOriginUrl, sizeof(((*ppxWebsocketState)->xUrl).sOrigin));
+  
+  if (((*ppxWebsocketState)->xUrl).sOrigin[BBWANT_URL_SIZE - 1] != 0)
+  {
+    u8RetVal = BBWANT_ERROR;
+
+    return u8RetVal;
+  }
   return u8RetVal;
 }
 
