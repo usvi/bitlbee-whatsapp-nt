@@ -22,28 +22,58 @@ static uint8_t u8BBWANT_CoreWebsocket_ParseUrl(tBBWANT_CoreWebsocketUrl* pxUrl,
 
 
   char sUrlBuf[BBWANT_URL_SIZE] = { 0 };
-  strncpy(sUrlBuf, sWebsocketUrl, sizeof(sUrlBuf));
+  char* sBufPos = NULL;
 
+  strncpy(sUrlBuf, sWebsocketUrl, sizeof(sUrlBuf));
+  
   if (sUrlBuf[BBWANT_URL_SIZE - 1] != 0)
   {
     u8RetVal = BBWANT_ERROR;
 
     return u8RetVal;
   }
-
-  printf(">%s<\n", sUrlBuf);
-  
   if (strncmp(sUrlBuf, "ws://", strlen("ws://")) == 0)
   {
     memmove(sUrlBuf, sUrlBuf + strlen("ws://"), BBWANT_URL_SIZE - strlen("ws://"));
     memset(sUrlBuf + BBWANT_URL_SIZE - strlen("ws://"), 0, strlen("ws://"));
+
+    printf("Got unsecure\n");
   }
   else if (strncmp(sUrlBuf, "wss://", strlen("wss://")) == 0)
   {
     memmove(sUrlBuf, sUrlBuf + strlen("wss://"), BBWANT_URL_SIZE - strlen("wss://"));
     memset(sUrlBuf + BBWANT_URL_SIZE - strlen("wss://"), 0, strlen("wss://"));
+    pxUrl->u8Secure = 1;
+    
+    printf("Got secure\n");
   }
- 
+  else
+  {
+    u8RetVal = BBWANT_ERROR;
+
+    return u8RetVal;
+  }
+  // Getting the hostname now
+  sBufPos = strstr(sUrlBuf, "/");
+
+  if (sBufPos == NULL)
+  {
+    u8RetVal = BBWANT_ERROR;
+
+    return u8RetVal;
+  }
+  // Copy out amount of length find, eg. sBufPos - sUrlBuf
+  memcpy(pxUrl->sHostname, sUrlBuf, sBufPos - sUrlBuf);
+  // Move to left by the amount found
+  memmove(sUrlBuf, sBufPos, sBufPos - sUrlBuf);
+  // Zero rest of buffer, just in case
+  memset(sUrlBuf + strlen(sBufPos), 0, BBWANT_URL_SIZE - strlen(sBufPos));
+
+  // Hostname can have :81, so check:
+  
+  printf("Got hostname >%s<\n", pxUrl->sHostname);
+  printf("Continuing with >%s<\n", sUrlBuf);
+  
   return u8RetVal;
 }
 
@@ -62,6 +92,8 @@ uint8_t u8BBWANT_CoreWebsocket_Init(tBBWANT_CoreWebsocketState** ppxWebsocketSta
 
     return u8RetVal;
   }
+  memset(*ppxWebsocketState, 0, sizeof(tBBWANT_CoreWebsocketState));
+	 
   u8RetVal = u8BBWANT_CoreWebsocket_ParseUrl(&((*ppxWebsocketState)->xUrl), sWebsocketUrl);
 
   if (u8RetVal == BBWANT_ERROR)
