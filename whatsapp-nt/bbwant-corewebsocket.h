@@ -2,7 +2,9 @@
 #define _BBWANT_COREWEBSOCKET_H_
 
 #include "bbwant.h"
+
 #include <stdint.h>
+#include <gnutls/gnutls.h>
 
 
 typedef struct
@@ -17,8 +19,14 @@ typedef struct
 
 typedef struct
 {
-  tBBWANT_CoreWebsocketUrl xUrl;
+  gnutls_session_t xSession;
   
+} tBBWANT_CoreWebsocketTls;
+
+typedef struct
+{
+  tBBWANT_CoreWebsocketUrl xUrl;
+  tBBWANT_CoreWebsocketTls xTls;
 } tBBWANT_CoreWebsocketState;
 
 
