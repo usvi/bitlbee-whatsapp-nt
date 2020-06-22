@@ -82,14 +82,14 @@ uint8_t u8BBWANT_CoreWebsocket_ParseUrls(tBBWANT_CoreWebsocketState** ppxWebsock
     }
     // Otherwise all ok! Just need to zero stuff just in case.
 
-    memset(((*ppxWebsocketState)->xUrl).sHostname + strlen(((*ppxWebsocketState)->xUrl).sHostname),
+    memset((*ppxWebsocketState)->xUrl.sHostname + strlen((*ppxWebsocketState)->xUrl.sHostname),
 	   0, BBWANT_URL_SIZE - strlen(((*ppxWebsocketState)->xUrl).sHostname));
 
   }
   // If we are here, last part is path and ok to 
   memcpy(((*ppxWebsocketState)->xUrl).sPath, sUrlBuf, strlen(sUrlBuf));
   
-  strncpy(((*ppxWebsocketState)->xUrl).sOrigin, sOriginUrl, sizeof(((*ppxWebsocketState)->xUrl).sOrigin));
+  strncpy(((*ppxWebsocketState)->xUrl).sOrigin, sOriginUrl, sizeof((*ppxWebsocketState)->xUrl.sOrigin));
   
   if (((*ppxWebsocketState)->xUrl).sOrigin[BBWANT_URL_SIZE - 1] != 0)
   {
@@ -104,6 +104,73 @@ uint8_t u8BBWANT_CoreWebsocket_ParseUrls(tBBWANT_CoreWebsocketState** ppxWebsock
 static uint8_t u8BBWANT_CoreWebsocket_InitTls(tBBWANT_CoreWebsocketState** ppxWebsocketState)
 {
   uint8_t u8RetVal = BBWANT_OK;
+  int iGnuTlsRes = 0;
+
+  iGnuTlsRes = gnutls_certificate_allocate_credentials(&((*ppxWebsocketState)->xTls.xCredentials));
+
+  if (iGnuTlsRes != GNUTLS_E_SUCCESS)
+  {
+    u8RetVal = BBWANT_ERROR;
+
+    return u8RetVal;
+  }
+
+  iGnuTlsRes = gnutls_certificate_set_x509_trust_file((*ppxWebsocketState)->xTls.xCredentials,
+						      BBWANT_CAFILE,
+						      GNUTLS_X509_FMT_PEM);
+  if (iGnuTlsRes != GNUTLS_E_SUCCESS)
+  {
+    u8RetVal = BBWANT_ERROR;
+
+    return u8RetVal;
+  }
+  
+  iGnuTlsRes = gnutls_init(&((*ppxWebsocketState)->xTls.xSession), GNUTLS_CLIENT);
+  
+  if (iGnuTlsRes != GNUTLS_E_SUCCESS)
+  {
+    u8RetVal = BBWANT_ERROR;
+
+    return u8RetVal;
+  }
+
+  gnutls_session_set_ptr((*ppxWebsocketState)->xTls.xSession,
+			 (void*)((*ppxWebsocketState)->xUrl.sHostname));
+
+  iGnuTlsRes = gnutls_server_name_set((*ppxWebsocketState)->xTls.xSession, GNUTLS_NAME_DNS,
+				      (*ppxWebsocketState)->xUrl.sHostname,
+				      strlen((*ppxWebsocketState)->xUrl.sHostname));
+  
+  if (iGnuTlsRes != GNUTLS_E_SUCCESS)
+  {
+    u8RetVal = BBWANT_ERROR;
+
+    return u8RetVal;
+  }
+
+  iGnuTlsRes = gnutls_set_default_priority((*ppxWebsocketState)->xTls.xSession);
+  
+  if (iGnuTlsRes != GNUTLS_E_SUCCESS)
+  {
+    u8RetVal = BBWANT_ERROR;
+
+    return u8RetVal;
+  }
+
+  iGnuTlsRes = gnutls_credentials_set((*ppxWebsocketState)->xTls.xSession,
+				      GNUTLS_CRD_CERTIFICATE,
+				      (*ppxWebsocketState)->xTls.xCredentials);
+  
+  if (iGnuTlsRes != GNUTLS_E_SUCCESS)
+  {
+    u8RetVal = BBWANT_ERROR;
+
+    return u8RetVal;
+  }
+
+  gnutls_session_set_verify_cert((*ppxWebsocketState)->xTls.xSession,
+				 (*ppxWebsocketState)->xUrl.sHostname,
+				 0);
 
   return u8RetVal;
 }

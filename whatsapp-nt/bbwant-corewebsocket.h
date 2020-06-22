@@ -7,6 +7,9 @@
 #include <gnutls/gnutls.h>
 
 
+#define BBWANT_CAFILE "/etc/ssl/certs/ca-certificates.crt"
+
+
 typedef struct
 {
   char sHostname[BBWANT_URL_SIZE];
@@ -20,6 +23,7 @@ typedef struct
 typedef struct
 {
   gnutls_session_t xSession;
+  gnutls_certificate_credentials_t xCredentials;
   
 } tBBWANT_CoreWebsocketTls;
 
@@ -27,6 +31,7 @@ typedef struct
 {
   tBBWANT_CoreWebsocketUrl xUrl;
   tBBWANT_CoreWebsocketTls xTls;
+  int iTcpSocket;
 } tBBWANT_CoreWebsocketState;
 
 
