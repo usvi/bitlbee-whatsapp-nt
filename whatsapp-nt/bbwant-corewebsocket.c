@@ -101,6 +101,13 @@ uint8_t u8BBWANT_CoreWebsocket_ParseUrls(tBBWANT_CoreWebsocketState** ppxWebsock
 }
 
 
+static uint8_t u8BBWANT_CoreWebsocket_InitTls(tBBWANT_CoreWebsocketState** ppxWebsocketState)
+{
+  uint8_t u8RetVal = BBWANT_OK;
+
+  return u8RetVal;
+}
+
 
 uint8_t u8BBWANT_CoreWebsocket_Init(tBBWANT_CoreWebsocketState** ppxWebsocketState)
 {
@@ -115,9 +122,15 @@ uint8_t u8BBWANT_CoreWebsocket_Init(tBBWANT_CoreWebsocketState** ppxWebsocketSta
     return u8RetVal;
   }
   memset(*ppxWebsocketState, 0, sizeof(tBBWANT_CoreWebsocketState));
-	 
+
+  if ((*ppxWebsocketState)->xUrl.u8Secure)
+  {
+    u8RetVal = u8BBWANT_CoreWebsocket_InitTls(ppxWebsocketState);
+  }
+  
   return u8RetVal;
 }
+
 
 uint8_t u8BBWANT_CoreWebsocket_SetConnect(tBBWANT_CoreWebsocketState** ppxWebsocketState)
 {
@@ -126,12 +139,14 @@ uint8_t u8BBWANT_CoreWebsocket_SetConnect(tBBWANT_CoreWebsocketState** ppxWebsoc
   return u8RetVal;
 }
 
+
 uint32_t u32BBWANT_CoreWebsocket_Service(tBBWANT_CoreWebsocketState** ppxWebsocketState)
 {
   uint32_t u32RetVal = 0;
 
   return u32RetVal;
 }
+
 
 uint32_t u32BBWANT_CoreWebsocket_QueueForSend(tBBWANT_CoreWebsocketState** ppxWebsocketState,
 					      void* pData, uint32_t u32Size)
@@ -141,6 +156,7 @@ uint32_t u32BBWANT_CoreWebsocket_QueueForSend(tBBWANT_CoreWebsocketState** ppxWe
   return u32RetVal;
 }
 
+
 uint32_t u32BBWANT_CoreWebsocket_DequeueReceived(tBBWANT_CoreWebsocketState** ppxWebsocketState,
 						 void* pData, uint32_t u32Size)
 {
@@ -149,12 +165,14 @@ uint32_t u32BBWANT_CoreWebsocket_DequeueReceived(tBBWANT_CoreWebsocketState** pp
   return u32RetVal;
 }
 
+
 uint8_t u8BBWANT_CoreWebsocket_SetDisconnect(tBBWANT_CoreWebsocketState** ppxWebsocketState)
 {
   uint8_t u8RetVal = BBWANT_OK;
 
   return u8RetVal;
 }
+
 
 uint8_t u8BBWANT_CoreWebsocket_Deinit(tBBWANT_CoreWebsocketState** ppxWebsocketState)
 {
