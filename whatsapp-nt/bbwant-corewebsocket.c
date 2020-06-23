@@ -42,7 +42,7 @@ uint8_t u8BBWANT_CoreWebsocket_ParseUrls(tBBWANT_CoreWebsocketState** ppxWebsock
   {
     memmove(sUrlBuf, sUrlBuf + strlen("wss://"), BBWANT_URL_SIZE - strlen("wss://"));
     memset(sUrlBuf + BBWANT_URL_SIZE - strlen("wss://"), 0, strlen("wss://"));
-    ((*ppxWebsocketState)->xUrl).u8Secure = 1;
+    (*ppxWebsocketState)->xUrl.u8Secure = 1;
   }
   else
   {
@@ -240,11 +240,26 @@ uint8_t u8BBWANT_CoreWebsocket_SetDisconnect(tBBWANT_CoreWebsocketState** ppxWeb
   return u8RetVal;
 }
 
+static uint8_t u8BBWANT_CoreWebsocket_DeinitTls(tBBWANT_CoreWebsocketState** ppxWebsocketState)
+{
+  uint8_t u8RetVal = BBWANT_OK;
+
+  gnutls_deinit((*ppxWebsocketState)->xTls.xSession);
+  gnutls_certificate_free_credentials((*ppxWebsocketState)->xTls.xCredentials);
+  
+  return u8RetVal;
+}
+
 
 uint8_t u8BBWANT_CoreWebsocket_Deinit(tBBWANT_CoreWebsocketState** ppxWebsocketState)
 {
   uint8_t u8RetVal = BBWANT_OK;
 
+  if ((*ppxWebsocketState)->xUrl.u8Secure)
+  {
+    u8BBWANT_CoreWebsocket_DeinitTls(ppxWebsocketState);
+  }
+  
   if (*ppxWebsocketState != NULL)
   {
     free(*ppxWebsocketState);
