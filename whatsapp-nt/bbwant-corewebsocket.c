@@ -193,13 +193,19 @@ uint8_t u8BBWANT_CoreWebsocket_Init(tBBWANT_CoreWebsocketState** ppxWebsocketSta
   if ((*ppxWebsocketState)->xUrl.u8Secure)
   {
     u8RetVal = u8BBWANT_CoreWebsocket_InitTls(ppxWebsocketState);
+
+    if (u8RetVal != BBWANT_OK)
+    {
+      return u8RetVal;
+    }
   }
+  // Spawn thread which will live more or less its own life
   
   return u8RetVal;
 }
 
 
-uint8_t u8BBWANT_CoreWebsocket_SetConnect(tBBWANT_CoreWebsocketState** ppxWebsocketState)
+uint8_t u8BBWANT_CoreWebsocket_Connect(tBBWANT_CoreWebsocketState** ppxWebsocketState)
 {
   uint8_t u8RetVal = BBWANT_OK;
 
@@ -233,7 +239,7 @@ uint32_t u32BBWANT_CoreWebsocket_DequeueReceived(tBBWANT_CoreWebsocketState** pp
 }
 
 
-uint8_t u8BBWANT_CoreWebsocket_SetDisconnect(tBBWANT_CoreWebsocketState** ppxWebsocketState)
+uint8_t u8BBWANT_CoreWebsocket_Disconnect(tBBWANT_CoreWebsocketState** ppxWebsocketState)
 {
   uint8_t u8RetVal = BBWANT_OK;
 
