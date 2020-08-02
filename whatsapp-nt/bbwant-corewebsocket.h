@@ -27,6 +27,15 @@ typedef struct
   
 } tBBWANT_CoreWebsocketTls;
 
+#define BBWANT_COREWEBSOCKET_ERR_FATAL (((uint32_t)1) << 0)
+#define BBWANT_COREWEBSOCKET_ERR_NONFATAL (((uint32_t)1) << 1)
+#define BBWANT_COREWEBSOCKET_CONNECTING (((uint32_t)1) << 2)
+#define BBWANT_COREWEBSOCKET_CONNECTED (((uint32_t)1) << 3)
+#define BBWANT_COREWEBSOCKET_DISCONNECTING (((uint32_t)1) << 4)
+#define BBWANT_COREWEBSOCKET_RECV_MSGS_REMAIN (((uint32_t)1) << 5)
+#define BBWANT_COREWEBSOCKET_SEND_MSGS_RAMAIN (((uint32_t)1) << 6)
+
+
 typedef struct
 {
   tBBWANT_CoreWebsocketUrl xUrl;
@@ -35,12 +44,6 @@ typedef struct
 } tBBWANT_CoreWebsocketState;
 
 
-#define BBWANT_COREWEBSOCKET_ERR_FATAL (((uint32_t)1) << 0)
-#define BBWANT_COREWEBSOCKET_ERR_TOO_BIG (((uint32_t)1) << 1)
-#define BBWANT_COREWEBSOCKET_CONNECTING (((uint32_t)1) << 2)
-#define BBWANT_COREWEBSOCKET_CONNECTED (((uint32_t)1) << 3)
-#define BBWANT_COREWEBSOCKET_DISCONNECTING (((uint32_t)1) << 4)
-#define BBWANT_COREWEBSOCKET_MSGS_REMAIN (((uint32_t)1) << 5)
 
 
 
@@ -51,8 +54,8 @@ uint8_t u8BBWANT_CoreWebsocket_Connect(tBBWANT_CoreWebsocketState** ppxWebsocket
 uint32_t u32BBWANT_CoreWebsocket_Service(tBBWANT_CoreWebsocketState** ppxWebsocketState);
 uint32_t u32BBWANT_CoreWebsocket_QueueForSend(tBBWANT_CoreWebsocketState** ppxWebsocketState,
 					      void* pData, uint32_t u32Size);
-uint32_t u32BBWANT_CoreWebsocket_DequeueReceived(tBBWANT_CoreWebsocketState** ppxWebsocketState,
-						 void* pData, uint32_t u32Size);
+uint32_t u32BBWANT_CoreWebsocket_PopReceived(tBBWANT_CoreWebsocketState** ppxWebsocketState,
+					     void* pData, uint32_t u32Size);
 uint8_t u8BBWANT_CoreWebsocket_Disconnect(tBBWANT_CoreWebsocketState** ppxWebsocketState);
 uint8_t u8BBWANT_CoreWebsocket_Deinit(tBBWANT_CoreWebsocketState** ppxWebsocketState);
 

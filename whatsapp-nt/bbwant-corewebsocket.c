@@ -5,8 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <inttypes.h>
-
-//static tBBWANT_CoreWebsocketState* gpxWebsocketState = NULL;
+#include <netdb.h>
 
 
 uint8_t u8BBWANT_CoreWebsocket_ParseUrls(tBBWANT_CoreWebsocketState** ppxWebsocketState,
@@ -199,7 +198,6 @@ uint8_t u8BBWANT_CoreWebsocket_Init(tBBWANT_CoreWebsocketState** ppxWebsocketSta
       return u8RetVal;
     }
   }
-  // Spawn thread which will live more or less its own life
   
   return u8RetVal;
 }
@@ -208,6 +206,33 @@ uint8_t u8BBWANT_CoreWebsocket_Init(tBBWANT_CoreWebsocketState** ppxWebsocketSta
 uint8_t u8BBWANT_CoreWebsocket_Connect(tBBWANT_CoreWebsocketState** ppxWebsocketState)
 {
   uint8_t u8RetVal = BBWANT_OK;
+  struct addrinfo xAddrInfoHints;
+
+  memset(&xAddrInfoHints, 0, sizeof(struct addrinfo));
+  xAddrInfoHints.ai_family = AF_INET;
+  xAddrInfoHints.ai_socktype = SOCK_STREAM;
+  xAddrInfoHints.ai_flags = 0;
+  xAddrInfoHints.ai_protocol = 0;
+
+
+  
+
+  // Make local socket
+  (*ppxWebsocketState)->iTcpSocket = socket(AF_INET, SOCK_STREAM, 0);
+
+  if ((*ppxWebsocketState)->iTcpSocket == -1)
+  {
+    u8RetVal = BBWANT_ERROR;
+
+    return u8RetVal;
+  }
+  // Try to get hostname, needed for connect
+  
+  
+  if ((*ppxWebsocketState)->xUrl.u8Secure)
+  {
+    (*ppxWebsocketState)->iTcpSocket = socket(AF_INET, SOCK_STREAM, 0);
+  }
 
   return u8RetVal;
 }
@@ -230,8 +255,8 @@ uint32_t u32BBWANT_CoreWebsocket_QueueForSend(tBBWANT_CoreWebsocketState** ppxWe
 }
 
 
-uint32_t u32BBWANT_CoreWebsocket_DequeueReceived(tBBWANT_CoreWebsocketState** ppxWebsocketState,
-						 void* pData, uint32_t u32Size)
+uint32_t u32BBWANT_CoreWebsocket_PopReceived(tBBWANT_CoreWebsocketState** ppxWebsocketState,
+					     void* pData, uint32_t u32Size)
 {
   uint32_t u32RetVal = 0;
 
