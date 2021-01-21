@@ -95,3 +95,4 @@ I am able to start the local server , the QR code that got generated is not vali
 start the web session sharing. Any idea??
 You need to update Whatsapp Web version to "0,4,2081"."
 
+Every websocket library has some stupidities so at some point I started to create my own.
