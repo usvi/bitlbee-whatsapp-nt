@@ -3,6 +3,8 @@
 OK, so in this repository I will try to create a bitlbee
 plugin for whatsapp. With C. Dunno what will happen. Lets see.
 
+Quick statuses: **NOT WORKING. MAYBE IN THE SUMMER OF 2022. SORRY.**
+
 Why the name? It means the next try of creating bilbee
 plugin for whatsapp. Because other people have tried and
 projects are now non-functioning or dormant. Or written
