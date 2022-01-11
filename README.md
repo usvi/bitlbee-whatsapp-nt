@@ -1,6 +1,7 @@
 # bitlbee-whatsapp-nt
 
 **NOTICE NOTICE NOTICE**
+
 **NOT WORKING AS OF 2022-01-11. MAYBE IN THE SUMMER OF 2022. SORRY.**
 
 OK, so in this repository I will try to create a bitlbee
